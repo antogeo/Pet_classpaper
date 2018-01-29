@@ -10,6 +10,7 @@ from sklearn.model_selection import (StratifiedKFold, StratifiedShuffleSplit,
                                      cross_val_score)
 from pypet.features import compute_regional_features
 from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.dummy import DummyClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, RobustScaler
@@ -25,7 +26,7 @@ elif os.uname()[1] == 'comameth':
 elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
 
-meta_fname = op.join(db_path, 'extra', 'SUV_database10172017.xlsx')
+meta_fname = op.join(db_path, 'extra', 'SUV_database10172017_2.xlsx')
 df = compute_regional_features(db_path, meta_fname)
 df = df.query('QC_PASS == True and ML_VALIDATION == False')
 
@@ -51,20 +52,27 @@ sss = StratifiedShuffleSplit(
 
 for t_iter, (train, test) in enumerate(sss.split(X, y)):
     for val in weight_val:
-        classifiers['SVC_fs_W40_10'] = Pipeline([
+        classifiers['SVC_fs20p'] = Pipeline([
                 ('scaler', RobustScaler()),
-                ('select', SelectPercentile(f_classif, 10.)),
+                ('select', SelectPercentile(f_classif, 20.)),
                 ('clf', SVC(kernel="linear", C=1,  probability=True,
-                            class_weight={0: .25, 1: 1}))
+                            class_weight={0: 1, 1: val}))
             ])
-        classifiers['SVC_fs_W10_26'] = Pipeline([
+        classifiers['SVC_fs10p'] = Pipeline([
                 ('scaler', RobustScaler()),
                 ('select', SelectPercentile(f_classif, 10.)),
                 ('clf', SVC(kernel="linear", C=1,  probability=True,
-                            class_weight={0: 1, 1: 2.6}))
+                            class_weight={0: 1, 1: val}))
+            ])
+        classifiers['RF_w'] = Pipeline([
+                ('scaler', RobustScaler()),
+                ('clf', RandomForestClassifier(
+                        max_depth=5, n_estimators=2000, max_features='auto',
+                        class_weight={0: 1, 1: val}))
             ])
         classifiers['Dummy'] = Pipeline([
-                ('clf', DummyClassifier(strategy="most_frequent",random_state=42))
+                ('clf', DummyClassifier(
+                 strategy="most_frequent", random_state=42))
             ])
         print('Iteration {}'.format(t_iter))
         X_train, X_test = X[train], X[test]
@@ -95,8 +103,7 @@ cw_mcs = np.sum(y)/y.shape[0]
 float(np.sum(y)) / y.shape[0]
 float(y.shape[0] - np.sum(y)) / y.shape[0]
 
-sns.pointplot(x="Weight Val", y="Recall", hue="Classifier", data=df)
-fig, ax = plt.subplots(1,1)
+fig, ax = plt.subplots(1, 1)
 sns.pointplot(x="Weight Val", y="Recall", hue="Classifier", data=df, ax=ax)
 sns.pointplot(x="Weight Val", y="Precision", hue="Classifier", data=df, ax=ax)
 sns.pointplot(x="Weight Val", y="AUC", hue="Classifier", data=df, ax=ax)
