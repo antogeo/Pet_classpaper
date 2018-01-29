@@ -42,13 +42,13 @@ results['Precision'] = []
 results['Recall'] = []
 
 sss = StratifiedShuffleSplit(
-    n_splits=50, test_size=0.3, random_state=42)
+    n_splits=500, test_size=0.3, random_state=42)
 
 classifiers['SVC_fs_W40_10'] = Pipeline([
         ('scaler', RobustScaler()),
         ('select', SelectPercentile(f_classif, 10.)),
         ('clf', SVC(kernel="linear", C=1, probability=True,
-                    class_weight={0: .25, 1: 1}))
+                    class_weight={0: 1, 1: .25}))
     ])
 classifiers['SVC_fs_W10_26'] = Pipeline([
         ('scaler', RobustScaler()),
@@ -60,7 +60,7 @@ classifiers['RF_w'] = Pipeline([
     ('scaler', RobustScaler()),
     ('clf', RandomForestClassifier(
         max_depth=5, n_estimators=2000, max_features='auto',
-        class_weight={0: 1, 1: 3}))
+        class_weight={0: 1, 1: .7}))
 ])
 classifiers['Dummy'] = Pipeline([
         ('clf', DummyClassifier(strategy="stratified", random_state=42))
@@ -90,10 +90,11 @@ for t_iter, (train, test) in enumerate(sss.split(X, y)):
 
 
 df = pd.DataFrame(results)
-df.to_csv('/models_eval.csv')
+df.to_csv('models_eval.csv')
 
 fig_mean, axes = pypet.viz.plot_values(
     df,
     values=['Recall', 'Precision', 'AUC'],
     target='Classifier',
     classes=['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w', 'Dummy'])
+plt.show()
