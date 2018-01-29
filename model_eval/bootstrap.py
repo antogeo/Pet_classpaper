@@ -1,11 +1,18 @@
 import numpy as np
-import pandas pd
+import pandas as pd
+import os
+import os.path as op
 from sklearn.utils import resample
 from sklearn.svm import SVC
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (roc_auc_score, precision_score, recall_score)
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import RobustScaler
+from sklearn.feature_selection import f_classif, SelectPercentile
 from matplotlib import pyplot
+from collections import OrderedDict
+from pypet.features import compute_regional_features
 
 # load dataset
 if os.uname()[1] == 'antogeo-XPS':
@@ -18,7 +25,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 meta_fname = op.join(db_path, 'extra', 'SUV_database10172017_2.xlsx')
 df = compute_regional_features(db_path, meta_fname)
 df_train = df.query('QC_PASS == True and ML_VALIDATION == False')
-df_eval = df.query('QC_PASS == True and ML_VALIDATION == True')
+df_val = df.query('QC_PASS == True and ML_VALIDATION == True')
 
 classifiers = OrderedDict()
 
@@ -45,33 +52,54 @@ classifiers['Dummy'] = Pipeline([
     ])
 
 markers = [x for x in df.columns if 'aal' in x]
-X = df[markers].values
-y = 1 - (df['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
+X_train = df[markers].values
+y_train = 1 - (df['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
 
 # configure bootstrap
-n_iterations = 1000
-n_size = int(len(data) * 0.50)
+t_iter = 1000
+n_size = int(len(df_val))
 # run bootstrap
 
-results = list()
+results = dict()
 results['Iteration'] = []
 results['Classifier'] = []
 results['AUC'] = []
 results['Precision'] = []
 results['Recall'] = []
 
-for i in range(n_iterations):
-	# prepare train and test sets
-	train = resample(values, n_samples=n_size)
-	test = numpy.array([x for x in values if x.tolist() not in train.tolist()])
-	# fit model
-	model = DecisionTreeClassifier()
-	model.fit(train[:,:-1], train[:,-1])
-	# evaluate model
-	predictions = model.predict(test[:,:-1])
-	score = accuracy_score(test[:,-1], predictions)
-	print(score)
-	results.append(score)
+for i in range(t_iter):
+    # prepare train and test sets
+    df_test = resample(df_val, n_samples=n_size)
+
+    markers = [x for x in df.columns if 'aal' in x]
+    X_test = df_test[markers].values
+    y_test = 1 - (
+        df_test['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
+    # fit model
+    for clf_name, clf in classifiers.items():
+        # Fit the model on the training set
+        clf.fit(X_train, y_train)
+
+        # Predict the test set
+        y_pred_proba = clf.predict_proba(X_test)[:, 1]
+        y_pred_class = clf.predict(X_test)
+
+        auc_score = roc_auc_score(y_test, y_pred_proba)
+        prec_score = precision_score(y_test, y_pred_class)
+        rec_score = recall_score(y_test, y_pred_class)
+
+        results['Iteration'].append(t_iter)
+        results['Classifier'].append(clf_name)
+        results['AUC'].append(auc_score)
+        results['Precision'].append(prec_score)
+        results['Recall'].append(rec_score)
+        print('Iter {} Clf = {} AUC = {} Prec = {} Rec = {}'.format(
+            i, clf_name, auc_score, prec_score, rec_score))
+
+
+df = pd.DataFrame(results)
+df.to_csv('models_eval.csv')
+
 # plot scores
 pyplot.hist(results)
 pyplot.show()

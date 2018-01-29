@@ -13,7 +13,7 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.dummy import DummyClassifier
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.preprocessing import RobustScaler
 from sklearn.metrics import (roc_auc_score, precision_recall_curve,
                              classification_report, precision_score,
                              recall_score)
