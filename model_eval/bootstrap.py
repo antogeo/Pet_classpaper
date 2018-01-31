@@ -109,6 +109,8 @@ import matplotlib.pyplot as plt
 
 df = pd.read_csv('boot_1000.csv')
 
+plt.figure(1)
+plt.subplot(221)
 SVM_AUC = df.loc[df['Classifier'] == 'SVC_fs_W40_10', 'AUC']
 plt.hist(SVM_AUC, histtype='stepfilled', align='mid')
 SVM_rec = df.loc[df['Classifier'] == 'SVC_fs_W40_10', 'Recall']
@@ -117,6 +119,7 @@ SVM_prec = df.loc[df['Classifier'] == 'SVC_fs_W40_10', 'Precision']
 plt.hist(SVM_prec, histtype='stepfilled', align='mid')
 plt.show()
 
+plt.subplot(222)
 SVM2_AUC = df.loc[df['Classifier'] == 'SVC_fs_W10_26', 'AUC']
 plt.hist(SVM2_AUC, histtype='stepfilled', align='mid')
 SVM2_rec = df.loc[df['Classifier'] == 'SVC_fs_W10_26', 'Recall']
@@ -125,6 +128,7 @@ SVM2_prec = df.loc[df['Classifier'] == 'SVC_fs_W10_26', 'Precision']
 plt.hist(SVM2_prec, histtype='stepfilled', align='mid')
 plt.show()
 
+plt.subplot(223)
 RF_AUC = df.loc[df['Classifier'] == 'RF_w', 'AUC']
 plt.hist(RF_AUC, histtype='stepfilled', align='mid')
 RF_rec = df.loc[df['Classifier'] == 'RF_w', 'Recall']
@@ -133,6 +137,7 @@ RF_prec = df.loc[df['Classifier'] == 'RF_w', 'Precision']
 plt.hist(RF_prec, histtype='stepfilled', align='mid')
 plt.show()
 
+plt.subplot(224)
 Dummy_AUC = df.loc[df['Classifier'] == 'Dummy', 'AUC']
 plt.hist(Dummy_AUC, histtype='stepfilled', align='mid', color='blue')
 Dummy_rec = df.loc[df['Classifier'] == 'Dummy', 'Recall']
