@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 import os.path as op
+import seaborn as sns
 from sklearn.utils import resample
 from sklearn.svm import SVC
 from sklearn.dummy import DummyClassifier
@@ -10,7 +11,7 @@ from sklearn.metrics import (roc_auc_score, precision_score, recall_score)
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
 from sklearn.feature_selection import f_classif, SelectPercentile
-from matplotlib import pyplot
+import matplotlib.pyplot as plt
 from collections import OrderedDict
 from pypet.features import compute_regional_features
 
@@ -100,14 +101,14 @@ for i in range(t_iter):
 df = pd.DataFrame(results)
 df.to_csv('models_eval.csv')
 
-# plot scores
-import os
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-
-
 df = pd.read_csv('boot_1000.csv')
+
+fig_mean, axes = pypet.viz.plot_values(
+    df,
+    values=['Recall', 'Precision', 'AUC'],
+    target='Classifier',
+    classes=['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w', 'Dummy'])
+plt.show()
 
 plt.figure(1)
 plt.subplot(221)
