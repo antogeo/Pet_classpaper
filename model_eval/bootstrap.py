@@ -109,6 +109,13 @@ import matplotlib.pyplot as plt
 
 df = pd.read_csv('boot_1000.csv')
 
+fig_mean, axes = pypet.viz.plot_values(
+    df,
+    values=['Recall', 'Precision', 'AUC'],
+    target='Classifier',
+    classes=['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w', 'Dummy'])
+plt.show()
+
 plt.figure(1)
 plt.subplot(221)
 SVM_AUC = df.loc[df['Classifier'] == 'SVC_fs_W40_10', 'AUC']
