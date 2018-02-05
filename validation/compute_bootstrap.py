@@ -13,6 +13,7 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.feature_selection import f_classif, SelectPercentile
 import matplotlib.pyplot as plt
 from collections import OrderedDict
+
 from pypet.features import compute_regional_features
 
 # load dataset
@@ -58,7 +59,10 @@ y_train = 1 - (df['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
 
 # configure bootstrap
 t_iter = 1000
-n_size = int(len(df_val))
+
+y_val = 1 - (df_val['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
+sizes = [np.sum(y_val == 0), np.sum(y_val == 1)]
+
 # run bootstrap
 
 results = dict()
@@ -68,19 +72,25 @@ results['AUC'] = []
 results['Precision'] = []
 results['Recall'] = []
 
+for clf_name, clf in classifiers.items():
+    # Fit the model on the training set
+    clf.fit(X_train, y_train)
+
 for i in range(t_iter):
     # prepare train and test sets
-    df_test = resample(df_val, n_samples=n_size)
+    df_test_vs = resample(
+        df_val[y_val == 0], n_samples=sizes[0], random_state=i)
+    df_test_mcs = resample(
+        df_val[y_val == 1], n_samples=sizes[1], random_state=i)
 
-    markers = [x for x in df.columns if 'aal' in x]
+    df_test = df_test_vs.append(df_test_mcs)
+
     X_test = df_test[markers].values
     y_test = 1 - (
         df_test['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
     # fit model
-    for clf_name, clf in classifiers.items():
-        # Fit the model on the training set
-        clf.fit(X_train, y_train)
 
+    for clf_name, clf in classifiers.items():
         # Predict the test set
         y_pred_proba = clf.predict_proba(X_test)[:, 1]
         y_pred_class = clf.predict(X_test)
@@ -99,58 +109,4 @@ for i in range(t_iter):
 
 
 df = pd.DataFrame(results)
-df.to_csv('models_eval.csv')
-
-df = pd.read_csv('boot_1000.csv')
-
-fig_mean, axes = pypet.viz.plot_values(
-    df,
-    values=['Recall', 'Precision', 'AUC'],
-    target='Classifier',
-    classes=['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w', 'Dummy'])
-plt.show()
-
-plt.figure(1)
-plt.subplot(221)
-SVM_AUC = df.loc[df['Classifier'] == 'SVC_fs_W40_10', 'AUC']
-plt.hist(SVM_AUC, histtype='stepfilled', align='mid')
-SVM_rec = df.loc[df['Classifier'] == 'SVC_fs_W40_10', 'Recall']
-plt.hist(SVM_rec, histtype='stepfilled', align='mid')
-SVM_prec = df.loc[df['Classifier'] == 'SVC_fs_W40_10', 'Precision']
-plt.hist(SVM_prec, histtype='stepfilled', align='mid')
-plt.show()
-
-plt.subplot(222)
-SVM2_AUC = df.loc[df['Classifier'] == 'SVC_fs_W10_26', 'AUC']
-plt.hist(SVM2_AUC, histtype='stepfilled', align='mid')
-SVM2_rec = df.loc[df['Classifier'] == 'SVC_fs_W10_26', 'Recall']
-plt.hist(SVM2_rec, histtype='stepfilled', align='mid')
-SVM2_prec = df.loc[df['Classifier'] == 'SVC_fs_W10_26', 'Precision']
-plt.hist(SVM2_prec, histtype='stepfilled', align='mid')
-plt.show()
-
-plt.subplot(223)
-RF_AUC = df.loc[df['Classifier'] == 'RF_w', 'AUC']
-plt.hist(RF_AUC, histtype='stepfilled', align='mid')
-RF_rec = df.loc[df['Classifier'] == 'RF_w', 'Recall']
-plt.hist(RF_rec, histtype='stepfilled', align='mid')
-RF_prec = df.loc[df['Classifier'] == 'RF_w', 'Precision']
-plt.hist(RF_prec, histtype='stepfilled', align='mid')
-plt.show()
-
-plt.subplot(224)
-Dummy_AUC = df.loc[df['Classifier'] == 'Dummy', 'AUC']
-plt.hist(Dummy_AUC, histtype='stepfilled', align='mid', color='blue')
-Dummy_rec = df.loc[df['Classifier'] == 'Dummy', 'Recall']
-plt.hist(Dummy_rec, histtype='stepfilled', align='mid', color='green')
-Dummy_prec = df.loc[df['Classifier'] == 'Dummy', 'Precision']
-plt.hist(Dummy_prec, histtype='barstacked', align='mid', color='red')
-plt.show()
-
-# confidence intervals
-alpha = 0.95
-p = ((1.0-alpha)/2.0) * 100
-lower = max(0.0, numpy.percentile(results, p))
-p = (alpha+((1.0-alpha)/2.0)) * 100
-upper = min(1.0, numpy.percentile(results, p))
-print('%.1f confidence interval %.1f%% and %.1f%%' % (alpha*100, lower*100, upper*100))
+df.to_csv('boot_1000.csv')
