@@ -1,21 +1,13 @@
 import os
 import os.path as op
 import numpy as np
-import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
-import pypet
-from collections import OrderedDict
-from sklearn.model_selection import (StratifiedKFold, StratifiedShuffleSplit,
-                                     cross_val_score)
-from pypet.features import compute_regional_features
-from sklearn.svm import SVC
-from sklearn.dummy import DummyClassifier
-from sklearn.ensemble import RandomForestClassifier
+import seaborn as sns
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, RobustScaler
-from sklearn.metrics import (roc_auc_score, precision_score, recall_score)
-from sklearn.feature_selection import SelectKBest, f_classif, SelectPercentile
+from sklearn.preprocessing import RobustScaler
+from sklearn.feature_selection import f_classif, SelectPercentile
+from pypet.features import compute_regional_features
+
 
 if os.uname()[1] == 'antogeo-XPS':
     db_path = '/home/antogeo/data/PET/pet_suv_db/'
@@ -47,14 +39,13 @@ clf = Pipeline([
     ])
 
 clf.fit(X_train, y_train)
-p_values  = clf.named_steps['select'].pvalues_
+p_values = clf.named_steps['select'].pvalues_
 val_shorted = np.argsort(p_values)
-for ind in val_shorted:
-    f, axes = plt.subplots(2, 1, sharey=True)
+for rank, ind in enumerate(val_shorted):
+    fig, axes = plt.subplots(2, 1, sharex=True)
     plot = sns.distplot(X_train[y_train == 0, ind], ax=axes[0])
     plot = sns.distplot(X_train[y_train == 1, ind], ax=axes[0])
     plot = sns.distplot(X_val[y_val == 0, ind], ax=axes[1])
     plot = sns.distplot(X_val[y_val == 1, ind], ax=axes[1])
-    plt.savefig("test.pdf")
-    plt.savefig(plot.fig)
-plt.close(fig)
+    plt.savefig(rank + "_" + df_train[markers].columns[ind] + ".pdf")
+    plt.close(fig)

@@ -1,9 +1,9 @@
 # plot scores
 import os
 import pandas as pd
-import seaborn as sns
+import numpy as np
 import matplotlib.pyplot as plt
-
+import pypet
 
 df = pd.read_csv('boot_1000.csv')
 
@@ -54,7 +54,8 @@ plt.show()
 # confidence intervals
 alpha = 0.95
 p = ((1.0-alpha)/2.0) * 100
-lower = max(0.0, numpy.percentile(results, p))
+lower = max(0.0, np.percentile(results, p))
 p = (alpha+((1.0-alpha)/2.0)) * 100
-upper = min(1.0, numpy.percentile(results, p))
-print('%.1f confidence interval %.1f%% and %.1f%%' % (alpha*100, lower*100, upper*100))
+upper = min(1.0, np.percentile(results, p))
+print('%.1f confidence interval %.1f%% and %.1f%%' % (
+    alpha*100, lower*100, upper*100))
