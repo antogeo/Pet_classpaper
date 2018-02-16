@@ -60,7 +60,7 @@ to_plot = [
     ('Label', 'RF_w'),
     ('SVC_fs_W10_26', 'SVC_fs_W40_10'),
     ('SVC_fs_W10_26', 'RF_w'),
-    ('SVC_fs_W40_10', 'RF_w'),
+    ('SVC_fs_W40_10', 'RF_w')
 ]
 for c1, c2 in to_plot:
     y1 = df[c1].values
