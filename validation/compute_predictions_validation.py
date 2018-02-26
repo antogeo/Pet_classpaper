@@ -3,15 +3,17 @@ import pandas as pd
 import os
 import os.path as op
 import seaborn as sns
+import itertools
 from sklearn.utils import resample
 from sklearn.svm import SVC
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import (roc_auc_score, precision_score, recall_score)
+from sklearn.metrics import (roc_auc_score, precision_score, recall_score,
+    confusion_matrix)
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
 from sklearn.feature_selection import f_classif, SelectPercentile
-import matplotlib.pyplot as plt
+
 from collections import OrderedDict
 
 from pypet.features import compute_regional_features
@@ -28,6 +30,7 @@ meta_fname = op.join(db_path, 'extra', 'SUV_database10172017_2.xlsx')
 df = compute_regional_features(db_path, meta_fname)
 df_train = df.query('QC_PASS == True and ML_VALIDATION == False')
 df_val = df.query('QC_PASS == True and ML_VALIDATION == True')
+
 
 classifiers = OrderedDict()
 
@@ -55,70 +58,44 @@ classifiers['Dummy'] = Pipeline([
 
 markers = [x for x in df.columns if 'aal' in x]
 X_train = df_train[markers].values
-y_train = 1 - (df_train['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
+X_test = df_val[markers].values
+y_train = 1 - (
+    df_train['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
+y_test = 1 - (
+    df_val['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
 
-# configure bootstrap
-t_iter = 1000
+class_names = ['UWS', 'MCS']
 
-y_val = 1 - (df_val['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
-sizes = [np.sum(y_val == 0), np.sum(y_val == 1)]
-
-# run bootstrap
+sizes = [np.sum(y_test == 0), np.sum(y_test == 1)]
 
 results = dict()
-results['Iteration'] = []
+results['Code'] = []
 results['Classifier'] = []
-results['AUC'] = []
-results['Precision'] = []
-results['Recall'] = []
+results['Label'] = []
+results['Prediction'] = []
 
-predictions = dict()
-predictions['Patient'] = []
-predictions['Classifier'] = []
-predictions['Label'] = []
+# results['SVC_fs_W40_10'] = []
+# results['SVC_fs_W10_26'] = []
+# results['RF_w'] = []
+# results['Dummy'] = []
+
 
 
 
 for clf_name, clf in classifiers.items():
     # Fit the model on the training set\
-    print(clf_name, clf)
+    # print(clf_name, clf)
     clf.fit(X_train, y_train)
-    probas = clf.predict_proba(X_train)[:, 1]
-    auc_score = roc_auc_score(y_train, probas)
-    print('In sample AUC: {}'.format(auc_score))
-
-
-for i in range(t_iter):
-    # prepare train and test sets
-    df_test_vs = resample(
-        df_val[y_val == 0], n_samples=sizes[0], random_state=i)
-    df_test_mcs = resample(
-        df_val[y_val == 1], n_samples=sizes[1], random_state=i)
-
-    df_test = df_test_vs.append(df_test_mcs)
-
-    X_test = df_test[markers].values
-    y_test = 1 - (
-        df_test['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
-    # fit model
-
-    for clf_name, clf in classifiers.items():
-        # Predict the test set
-        y_pred_proba = clf.predict_proba(X_test)[:, 1]
-        y_pred_class = clf.predict(X_test)
-
-        auc_score = roc_auc_score(y_test, y_pred_proba)
-        prec_score = precision_score(y_test, y_pred_class)
-        rec_score = recall_score(y_test, y_pred_class)
-
-        results['Iteration'].append(t_iter)
-        results['Classifier'].append(clf_name)
-        results['AUC'].append(auc_score)
-        results['Precision'].append(prec_score)
-        results['Recall'].append(rec_score)
-        print('Iter {} Clf = {} AUC = {} Prec = {} Rec = {}'.format(
-            i, clf_name, auc_score, prec_score, rec_score))
-
+    results['Code'].extend(df_val['Code'].values)
+    results['Label'].extend(y_test)
+    results['Classifier'].extend([clf_name for x in y_test])
+    results['Prediction'].extend(clf.predict(X_test))
+#     cnf_matrix = confusion_matrix(y_test, y_pred)
+#     plt.figure()
+#     plot_confusion_matrix(cnf_matrix, classes=class_names,
+#         title='Confusion matrix, without normalization' + clf_name)
+#
+# plt.show()
 
 df = pd.DataFrame(results)
-df.to_csv('boot_1000.csv')
+df.to_csv('predictions.csv')
