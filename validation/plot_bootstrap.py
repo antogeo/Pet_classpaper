@@ -70,22 +70,22 @@ SVM2_prec_mean = SVM2_prec.mean()
 # confidence intervals
 alpha = 0.95
 p = ((1.0-alpha)/2.0) * 100
-lower = max(0.0, np.percentile(Dummy_AUC, p))
+lower = max(0.0, np.percentile(RF_AUC, p))
 p = (alpha+((1.0-alpha)/2.0)) * 100
-upper = min(1.0, np.percentile(Dummy_AUC, p))
+upper = min(1.0, np.percentile(RF_AUC, p))
 print('%.1f confidence interval of AUC:  %.1f%% and %.1f%%' % (
     alpha*100, lower*100, upper*100))
 
 p = ((1.0-alpha)/2.0) * 100
-lower = max(0.0, np.percentile(Dummy_rec, p))
+lower = max(0.0, np.percentile(RF_rec, p))
 p = (alpha+((1.0-alpha)/2.0)) * 100
-upper = min(1.0, np.percentile(Dummy_rec, p))
+upper = min(1.0, np.percentile(RF_rec, p))
 print('%.1f confidence interval of Recall %.1f%% and %.1f%%' % (
     alpha*100, lower*100, upper*100))
 
 p = ((1.0-alpha)/2.0) * 100
-lower = max(0.0, np.percentile(Dummy_prec, p))
+lower = max(0.0, np.percentile(RF_prec, p))
 p = (alpha+((1.0-alpha)/2.0)) * 100
-upper = min(1.0, np.percentile(Dummy_prec, p))
+upper = min(1.0, np.percentile(RF_prec, p))
 print('%.1f confidence intervalof Precision %.1f%% and %.1f%%' % (
     alpha*100, lower*100, upper*100))

@@ -13,6 +13,7 @@ images = []
 read_subjects = []
 for subject in subjects:
     s_path = op.join(subj_path, subject)
+    print(s_path)
     if what == 'wSUV':
         files = glob(op.join(s_path, '*wSUV.nii'))
         if len(files) == 0:
