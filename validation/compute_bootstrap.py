@@ -50,7 +50,7 @@ classifiers['RF_w'] = Pipeline([
         class_weight={0: 1, 1: .7}))
 ])
 classifiers['Dummy'] = Pipeline([
-        ('clf', DummyClassifier(strategy="stratified", random_state=42))
+        ('clf', DummyClassifier(strategy="stratified"))
     ])
 
 markers = [x for x in df.columns if 'aal' in x]
@@ -111,7 +111,7 @@ for i in range(t_iter):
         prec_score = precision_score(y_test, y_pred_class)
         rec_score = recall_score(y_test, y_pred_class)
 
-        results['Iteration'].append(t_iter)
+        results['Iteration'].append(i)
         results['Classifier'].append(clf_name)
         results['AUC'].append(auc_score)
         results['Precision'].append(prec_score)
