@@ -98,7 +98,7 @@ for t_iter, (train, test) in enumerate(sss.split(X, y)):
 
 df = pd.DataFrame(results)
 df.to_csv(
-    '/home/coma_meth/Documents/antogeo/git_codes/PET_class/scratch/weights_eval.csv')
+    '../PET_class/scratch/weights_eval.csv')
 cw_mcs = np.sum(y)/y.shape[0]
 float(np.sum(y)) / y.shape[0]
 float(y.shape[0] - np.sum(y)) / y.shape[0]

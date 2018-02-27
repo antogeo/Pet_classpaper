@@ -88,12 +88,12 @@ for clf in np.unique(df['Classifier']):
         df.loc[df['Classifier'] == clf, 'Precision'], p_up))
     upper_Prec = min(1.0, np.percentile(
         df.loc[df['Classifier'] == clf, 'Precision'], p_low))
-    print('%.1f confidence interval of Precision for %s:  %.1f%% and %.1f%%' % (
+    print('%.1f confidence interval of Precision for %s: %.1f%% and %.1f%%' % (
         alpha*100, clf, lower_Prec*100, upper_Prec*100))
 
 print('AUC mean of Dummy:  %.1f%%' % (
-    results['Mean AUC']['Classifier'== 'Dummy']))
+    results['Mean AUC']['Classifier' == 'Dummy']))
 print('Recall mean of Dummy:  %.1f%%' % (
-    results['Mean Recall']['Classifier'== 'Dummy']))
+    results['Mean Recall']['Classifier' == 'Dummy']))
 print('Prec mean of Dummy:  %.1f%%' % (
-     results['Mean Precision']['Classifier'== 'Dummy']))
+     results['Mean Precision']['Classifier' == 'Dummy']))
