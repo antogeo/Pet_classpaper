@@ -121,4 +121,4 @@ for i in range(t_iter):
 
 
 df = pd.DataFrame(results)
-df.to_csv('boot_1000.csv')
+df.to_csv('corrected_boot_1000.csv')
