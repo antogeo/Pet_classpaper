@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pypet
 
-df = pd.read_csv('validation/boot_1000.csv')
+df = pd.read_csv('corrected_boot_1000.csv')
 fig_mean, axes = pypet.viz.plot_values(
     df,
     values=['Recall', 'Precision', 'AUC'],
@@ -50,6 +50,21 @@ Dummy_prec = df.loc[df['Classifier'] == 'Dummy', 'Precision']
 plt.hist(Dummy_prec, histtype='barstacked', align='mid', color='red', bins=50)
 plt.show()
 
+results = dict()
+results['Classifier'] = []
+results['Mean AUC'] = []
+results['Mean Precision'] = []
+results['Mean Recall'] = []
+for clf in np.unique(df['Classifier']):
+    results['Classifier'].append(clf)
+    results['Mean AUC'].append(
+        df.loc[df['Classifier'] == clf, 'AUC'].mean())
+    results['Mean Recall'].append(
+        df.loc[df['Classifier'] == clf, 'Recall'].mean())
+    results['Mean Precision'].append(
+        df.loc[df['Classifier'] == clf, 'Precision'].mean())
+
+
 Dummy_AUC_mean = Dummy_AUC.mean()
 Dummy_rec_mean = Dummy_rec.mean()
 Dummy_prec_mean = Dummy_prec.mean()
@@ -75,6 +90,8 @@ p = (alpha+((1.0-alpha)/2.0)) * 100
 upper = min(1.0, np.percentile(RF_AUC, p))
 print('%.1f confidence interval of AUC:  %.1f%% and %.1f%%' % (
     alpha*100, lower*100, upper*100))
+print('AUC mean of Dummy:  %.1f%%' % (
+    Dummy_AUC_mean))
 
 p = ((1.0-alpha)/2.0) * 100
 lower = max(0.0, np.percentile(RF_rec, p))
@@ -82,6 +99,8 @@ p = (alpha+((1.0-alpha)/2.0)) * 100
 upper = min(1.0, np.percentile(RF_rec, p))
 print('%.1f confidence interval of Recall %.1f%% and %.1f%%' % (
     alpha*100, lower*100, upper*100))
+print('Recall mean of Dummy:  %.1f%%' % (
+    Dummy_rec_mean))
 
 p = ((1.0-alpha)/2.0) * 100
 lower = max(0.0, np.percentile(RF_prec, p))
@@ -89,3 +108,5 @@ p = (alpha+((1.0-alpha)/2.0)) * 100
 upper = min(1.0, np.percentile(RF_prec, p))
 print('%.1f confidence intervalof Precision %.1f%% and %.1f%%' % (
     alpha*100, lower*100, upper*100))
+print('Prec mean of Dummy:  %.1f%%' % (
+    Dummy_prec_mean))
