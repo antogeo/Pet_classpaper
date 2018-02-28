@@ -73,6 +73,7 @@ results['Code'] = []
 results['Classifier'] = []
 results['Label'] = []
 results['Prediction'] = []
+results['Probability'] = []
 
 # results['SVC_fs_W40_10'] = []
 # results['SVC_fs_W10_26'] = []
@@ -90,6 +91,8 @@ for clf_name, clf in classifiers.items():
     results['Label'].extend(y_test)
     results['Classifier'].extend([clf_name for x in y_test])
     results['Prediction'].extend(clf.predict(X_test))
+    proba = clf.predict_proba(X_test)
+    results['Probability'].extend(proba[:, 1])
 #     cnf_matrix = confusion_matrix(y_test, y_pred)
 #     plt.figure()
 #     plot_confusion_matrix(cnf_matrix, classes=class_names,
