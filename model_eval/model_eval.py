@@ -2,20 +2,18 @@ import os
 import os.path as op
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
 import pypet
 from collections import OrderedDict
-from sklearn.model_selection import (StratifiedKFold, StratifiedShuffleSplit,
-                                     cross_val_score)
+from sklearn.model_selection import StratifiedShuffleSplit
 from pypet.features import compute_regional_features
 from sklearn.svm import SVC
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.preprocessing import RobustScaler
 from sklearn.metrics import (roc_auc_score, precision_score, recall_score)
-from sklearn.feature_selection import SelectKBest, f_classif, SelectPercentile
+from sklearn.feature_selection import f_classif, SelectPercentile
 
 if os.uname()[1] == 'antogeo-XPS':
     db_path = '/home/antogeo/data/PET/pet_suv_db/'

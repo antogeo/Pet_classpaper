@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import os
 import os.path as op
-import seaborn as sns
 from sklearn.utils import resample
 from sklearn.svm import SVC
 from sklearn.dummy import DummyClassifier
@@ -11,7 +10,6 @@ from sklearn.metrics import (roc_auc_score, precision_score, recall_score)
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
 from sklearn.feature_selection import f_classif, SelectPercentile
-import matplotlib.pyplot as plt
 from collections import OrderedDict
 
 from pypet.features import compute_regional_features
@@ -55,7 +53,8 @@ classifiers['Dummy'] = Pipeline([
 
 markers = [x for x in df.columns if 'aal' in x]
 X_train = df_train[markers].values
-y_train = 1 - (df_train['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
+y_train = 1 - (
+    df_train['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
 
 # configure bootstrap
 t_iter = 1000
@@ -76,8 +75,6 @@ predictions = dict()
 predictions['Patient'] = []
 predictions['Classifier'] = []
 predictions['Label'] = []
-
-
 
 for clf_name, clf in classifiers.items():
     # Fit the model on the training set\
