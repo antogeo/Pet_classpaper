@@ -7,91 +7,51 @@ import pypet
 import seaborn as sns
 import matplotlib.gridspec as gridspec
 
-%matplotlib
-
-
-df = pd.read_csv('corrected_boot_1000.csv')
-
+df = pd.read_csv('../corrected_boot_1000.csv')
 Diff = dict()
-Diff['iter'] = []
-Diff['RF_AUC'] = []
-Diff['RF_Rec'] = []
-Diff['RF_Prec'] = []
-Diff['SVM40_10_AUC'] = []
-Diff['SVM40_10_Rec'] = []
-Diff['SVM40_10_Prec'] = []
-Diff['SVM10_26_AUC']= []
-Diff['SVM10_26_Rec'] = []
-Diff['SVM10_26_Prec'] = []
+Diff['Contrast'] = []
+Diff['AUC'] = []
+Diff['Prec'] = []
+Diff['Rec'] = []
 
-for iter in np.unique(df['Iteration']):
-    Diff['iter'].append(iter)
-    ###################### RF 10 - .7  #############################
-    Diff['RF_AUC'].extend(
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'RF_w'), 'AUC'].values - \
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'Dummy'), 'AUC'].values)
-    Diff['RF_Rec'].extend(
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'RF_w'), 'Recall'].values - \
-        df.loc[(df['Iteration'] == iter) & (
-        df['Classifier'] == 'Dummy'), 'Recall'].values)
-    Diff['RF_Prec'].extend(
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'RF_w'), 'Precision'].values - \
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'Dummy'), 'Precision'].values)
-    ###################### SVM 40 - 10  #############################
-    Diff['SVM40_10_AUC'].extend(
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'SVC_fs_W40_10'), 'AUC'].values - \
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'Dummy'), 'AUC'].values)
-    Diff['SVM40_10_Rec'].extend(
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'SVC_fs_W40_10'), 'Recall'].values - \
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'Dummy'), 'Recall'].values)
-    Diff['SVM40_10_Prec'].extend(
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'SVC_fs_W40_10'), 'Precision'].values - \
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'Dummy'), 'Precision'].values)
-    ###################### SVM 10 - 26  #############################
-    Diff['SVM10_26_AUC'].extend(
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'SVC_fs_W10_26'), 'AUC'].values - \
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'Dummy'), 'AUC'].values)
-    Diff['SVM10_26_Rec'].extend(
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'SVC_fs_W10_26'), 'Recall'].values - \
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'Dummy'), 'Recall'].values)
-    Diff['SVM10_26_Prec'].extend(
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'SVC_fs_W10_26'), 'Precision'].values - \
-        df.loc[(df['Iteration'] == iter) & (
-            df['Classifier'] == 'Dummy'), 'Precision'].values)
+for clf1 in np.unique(df['Classifier']):
+    for clf2 in np.unique(df['Classifier']):
+        if clf1 != clf2 and clf1 != 'Dummy':
+            df1 = df[df['Classifier'] == clf1]
+            df2 = df[df['Classifier'] == clf2]
+            contr = clf1 + '-' + clf2
+            Diff['AUC'].extend(df1['AUC'].values - df2['AUC'].values)
+            Diff['Prec'].extend(df1['Precision'].values - df2['Precision'].values)
+            Diff['Rec'].extend(df1['Recall'].values - df2['Recall'].values)
+            contrast = [contr] * len(df1)
+            Diff['Contrast'].extend(contrast)
 
 res = pd.DataFrame(Diff)
+
 # res.to_csv('DummyVSclfs.csv')
 
-gs = gridspec.GridSpec(2, 2, width_ratios=[1, 2], height_ratios=[4, 1])
+gs = gridspec.GridSpec(2, 1, height_ratios=[4, 1])
 
-test = sns.boxplot(x=target, y=t_value, data=res, showcaps=False,
-            boxprops={'facecolor':'None'},
-            showfliers=False,whiskerprops={'linewidth':0},
-            ax=t_ax, order=classes)
+ax1 = plt.subplot(gs[0])
+pypet.viz.plot_values(
+    df,
+    values = 'AUC',
+    target = 'Classifier',
+    axes = ax1,
+    classes = ['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w', 'Dummy'])
 
-class_res = ['RF_AUC', 'RF_Rec', 'RF_Prec']
-
-test = sns.violinplot(data=res, x=['RF_AUC', 'RF_Rec', 'RF_Prec'] ,y=['RF_AUC', 'RF_Rec', 'RF_Prec'])
-
-fig_mean, axes = pypet.viz.plot_values(
-    res,
-    values=['iter'],
-    target='Classifier',
-    classes=['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w'])
-plt.show()
+ax2 = plt.subplot(gs[1])
+sns.boxplot(data=res,
+    x = 'AUC',
+    y = 'Contrast',
+    ax=ax2)
+#
+#
+# figure(2)
+# Rec_plot = sns.boxplot(data=res,
+#     x = 'Rec',
+#     y = 'Contrast')
+# figure(3)
+# Prec_plot = sns.boxplot(data=res,
+#     x = 'Prec',
+#     y = 'Contrast')
