@@ -67,7 +67,8 @@ for c1, c2 in to_plot:
     y2 = df[c2].values
     cnf_matrix = confusion_matrix(y1, y2)
     plt.figure()
-    plot_confusion_matrix(cnf_matrix, classes=class_names, labels=[c1, c2],
+    plot_confusion_matrix(
+        cnf_matrix, classes=class_names, labels=[c1, c2],
         title='Confusion matrix, without normalization')
 
 plt.show()
@@ -77,7 +78,8 @@ y1 = t_df['Label'].values
 y2 = t_df['RF_w'].values
 cnf_matrix = confusion_matrix(y1, y2)
 plt.figure()
-plot_confusion_matrix(cnf_matrix, classes=class_names, labels=['Label', 'RF_w'],
+plot_confusion_matrix(
+    cnf_matrix, classes=class_names, labels=['Label', 'RF_w'],
     title='Middle Zone')
 
 plt.show()
