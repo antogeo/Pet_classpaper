@@ -20,11 +20,11 @@ for i, prob in enumerate(df.loc[df['Classifier'] == 'RF_w', 'Probability']):
 for i, prob in enumerate(df.loc[df['Classifier'] == 'RF_w', 'Probability']):
     ax.scatter(prob, i, s=120, c='r', marker=fill[i])
 ax.plot([.5, .5], [0, 50], 'k-', lw=1)
-
 ax.legend()
 ax.grid(True)
 fig.show()
 df.columns
+
 fig2, ax2 = plt.subplots()
 for ind, name in enumerate(np.unique(df['Code'])):
     color = ['b' if df.loc[df['Code'] == name, 'Label'].mean() == 1 else 'y']

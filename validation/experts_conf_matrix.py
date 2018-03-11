@@ -18,5 +18,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
 meta_fname = op.join(db_path, 'extra', 'SUV_database10172017_2.xlsx')
 
+df_Exp.columns
 df_Exp = pd.read_excel(meta_fname)
-df = df.query('QC_PASS == True and ML_VALIDATION == False')
+df = df_Exp.query('QC_PASS == True and ML_VALIDATION == False')
+Experts = df.loc[df_Exp['QC_PASS'] == 'True', 'AUR']
