@@ -30,28 +30,61 @@ res = pd.DataFrame(Diff)
 
 # res.to_csv('DummyVSclfs.csv')
 
+plt.figure(1)
 gs = gridspec.GridSpec(2, 1, height_ratios=[4, 1])
 
 ax1 = plt.subplot(gs[0])
+
 pypet.viz.plot_values(
     df,
     values = 'AUC',
     target = 'Classifier',
     axes = ax1,
-    classes = ['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w', 'Dummy'])
+    classes = ['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w', 'Dummy'],
+    style='violinplot')
 
 ax2 = plt.subplot(gs[1])
 sns.boxplot(data=res,
     x = 'AUC',
     y = 'Contrast',
     ax=ax2)
-#
-#
-# figure(2)
-# Rec_plot = sns.boxplot(data=res,
-#     x = 'Rec',
-#     y = 'Contrast')
-# figure(3)
-# Prec_plot = sns.boxplot(data=res,
-#     x = 'Prec',
-#     y = 'Contrast')
+
+plt.figure(2)
+gs2 = gridspec.GridSpec(2, 1, height_ratios=[4, 1])
+
+ax21 = plt.subplot(gs2[0])
+
+pypet.viz.plot_values(
+    df,
+    values = 'Recall',
+    target = 'Classifier',
+    axes = ax21,
+    classes = ['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w', 'Dummy'],
+    style='violinplot')
+
+ax22 = plt.subplot(gs2[1])
+sns.boxplot(data=res,
+    x = 'Rec',
+    y = 'Contrast',
+    ax=ax22)
+
+plt.figure(3)
+gs3 = gridspec.GridSpec(2, 1, height_ratios=[4, 1])
+
+ax31 = plt.subplot(gs3[0])
+
+pypet.viz.plot_values(
+    df,
+    values = 'Precision',
+    target = 'Classifier',
+    axes = ax31,
+    classes = ['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w', 'Dummy'],
+    style='violinplot')
+
+ax32 = plt.subplot(gs3[1])
+sns.boxplot(data=res,
+    x = 'Prec',
+    y = 'Contrast',
+    ax=ax32)
+
+plt.show()
