@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import pypet
-
+%matplotlib
 df = pd.read_csv('corrected_boot_1000.csv')
 fig_mean, axes = pypet.viz.plot_values(
     df,
@@ -67,29 +67,49 @@ for clf in np.unique(df['Classifier']):
     results['Mean Precision'].append(
         df.loc[df['Classifier'] == clf, 'Precision'].mean())
     alpha = 0.95
-    p_up = ((1.0-alpha)/2.0) * 100
-    p_low = (alpha+((1.0-alpha)/2.0)) * 100
+    p_low = ((1.0-alpha)/2.0) * 100
+    p_up = (alpha+((1.0-alpha)/2.0)) * 100
 
     lower_AUC = max(0.0, np.percentile(
-        df.loc[df['Classifier'] == clf, 'AUC'], p_up))
-    upper_AUC = min(1.0, np.percentile(
         df.loc[df['Classifier'] == clf, 'AUC'], p_low))
+    upper_AUC = min(1.0, np.percentile(
+        df.loc[df['Classifier'] == clf, 'AUC'], p_up))
     print('%.1f confidence interval of AUC for %s:  %.1f%% and %.1f%%' % (
         alpha*100, clf, lower_AUC*100, upper_AUC*100))
+    if clf is not 'Dummy':
+        # p-values calculated from Douglas G. & Martin J., BMJ 2011
+        # "How to obtain the P value fron a confidence interval"
+        SE_AUC = (upper_AUC - lower_AUC) / (2 * 1.96)
+        z = (df.loc[df['Classifier'] == clf, 'AUC'].mean() - \
+            df.loc[df['Classifier'] == 'Dummy', 'AUC'].mean()) / SE_AUC
+        Pval = np.exp((-.717 * z) - (.416 * (np.power(z, 2))))
+        print('%s p-value is %.3f' % (clf, Pval))
 
     lower_Rec = max(0.0, np.percentile(
-        df.loc[df['Classifier'] == clf, 'Recall'], p_up))
-    upper_Rec = min(1.0, np.percentile(
         df.loc[df['Classifier'] == clf, 'Recall'], p_low))
+    upper_Rec = min(1.0, np.percentile(
+        df.loc[df['Classifier'] == clf, 'Recall'], p_up))
     print('%.1f confidence interval of Recall for %s:  %.1f%% and %.1f%%' % (
         alpha*100, clf, lower_Rec*100, upper_Rec*100))
+    if clf is not 'Dummy':
+        SE_Rec = (upper_Rec - lower_Rec) / (2 * 1.96)
+        z = (df.loc[df['Classifier'] == clf, 'Recall'].mean() - \
+            df.loc[df['Classifier'] == 'Dummy', 'Recall'].mean()) / SE_Rec
+        Pval = np.exp((-.717 * z) - (.416 * (np.power(z, 2))))
+        print('%s p-value is %.3f' % (clf, Pval))
 
     lower_Prec = max(0.0, np.percentile(
-        df.loc[df['Classifier'] == clf, 'Precision'], p_up))
-    upper_Prec = min(1.0, np.percentile(
         df.loc[df['Classifier'] == clf, 'Precision'], p_low))
+    upper_Prec = min(1.0, np.percentile(
+        df.loc[df['Classifier'] == clf, 'Precision'], p_up))
     print('%.1f confidence interval of Precision for %s: %.1f%% and %.1f%%' % (
         alpha*100, clf, lower_Prec*100, upper_Prec*100))
+    if clf is not 'Dummy':
+        SE_Prec = (upper_Prec - lower_Prec) / (2 * 1.96)
+        z = (df.loc[df['Classifier'] == clf, 'Precision'].mean() - \
+            df.loc[df['Classifier'] == 'Dummy', 'Precision'].mean()) / SE_Prec
+        Pval = np.exp((-.717 * z) - (.416 * (np.power(z, 2))))
+        print('%s p-value is %.3f' % (clf, Pval))
 
 print('AUC mean of Dummy:  %.1f%%' % (
     results['Mean AUC']['Classifier' == 'Dummy']))
