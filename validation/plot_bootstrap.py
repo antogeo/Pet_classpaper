@@ -4,14 +4,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import pypet
-%matplotlib
-df = pd.read_csv('corrected_boot_1000.csv')
-fig_mean, axes = pypet.viz.plot_values(
-    df,
-    values=['Recall', 'Precision', 'AUC'],
-    target='Classifier',
-    classes=['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w', 'Dummy'])
-plt.show()
+# %matplotlib
+df = pd.read_csv('data/corrected_boot_1000.csv',
+                 index_col=['Iteration', 'Classifier'])[
+                    ['AUC', 'Precision', 'Recall']]
 
 SVM_AUC = df.loc[df['Classifier'] == 'SVC_fs_W40_10', 'AUC']
 SVM_rec = df.loc[df['Classifier'] == 'SVC_fs_W40_10', 'Recall']

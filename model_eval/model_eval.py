@@ -88,7 +88,7 @@ for t_iter, (train, test) in enumerate(sss.split(X, y)):
 
 
 df = pd.DataFrame(results)
-df.to_csv('models_eval.csv')
+df.to_csv('data/models_eval.csv')
 
 fig_mean, axes = pypet.viz.plot_values(
     df,

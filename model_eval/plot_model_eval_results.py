@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df = pd.read_csv('models_eval.csv')
+df = pd.read_csv('data/models_eval.csv')
 
 fig, axes = plt.subplots(1, 3, figsize=(12, 6))
 sns.swarmplot(
