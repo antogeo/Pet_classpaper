@@ -6,7 +6,7 @@ import pypet
 import seaborn as sns
 import matplotlib.gridspec as gridspec
 
-df = pd.read_csv('data/corrected_boot_1000.csv',
+df = pd.read_csv('validation/data/corrected_boot_1000.csv',
                  index_col=['Iteration', 'Classifier'])[
                     ['AUC', 'Precision', 'Recall']]
 
@@ -26,6 +26,8 @@ for cl1 in classifiers:
         diffs.append(t_diff)
 all_diffs = pd.concat(diffs)
 
+
+# all_diffs.to_csv('Clfs_contrasts.csv')
 
 def _compute_p_vals(df, column, ci=.95):
     p_low = ((1.0 - ci) / 2.0) * 100
@@ -49,66 +51,3 @@ def _compute_p_vals(df, column, ci=.95):
     return pd.DataFrame(results)
 
 p_vals = _compute_p_vals(all_diffs, 'Contrast')
-
-
-
-# res.to_csv('DummyVSclfs.csv')
-
-plt.figure(1)
-gs = gridspec.GridSpec(2, 1, height_ratios=[4, 1])
-
-ax1 = plt.subplot(gs[0])
-
-pypet.viz.plot_values(
-    df,
-    values='AUC',
-    target='Classifier',
-    axes=ax1,
-    classes=['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w', 'Dummy'],
-    style='violinplot')
-
-ax2 = plt.subplot(gs[1])
-sns.boxplot(data=res,
-            x='AUC',
-            y='Contrast',
-            ax=ax2)
-
-plt.figure(2)
-gs2 = gridspec.GridSpec(2, 1, height_ratios=[4, 1])
-
-ax21 = plt.subplot(gs2[0])
-
-pypet.viz.plot_values(
-    df,
-    values='Recall',
-    target='Classifier',
-    axes=ax21,
-    classes=['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w', 'Dummy'],
-    style='violinplot')
-
-ax22 = plt.subplot(gs2[1])
-sns.boxplot(data=res,
-            x='Rec',
-            y='Contrast',
-            ax=ax22)
-
-plt.figure(3)
-gs3 = gridspec.GridSpec(2, 1, height_ratios=[4, 1])
-
-ax31 = plt.subplot(gs3[0])
-
-pypet.viz.plot_values(
-    df,
-    values='Precision',
-    target='Classifier',
-    axes=ax31,
-    classes=['SVC_fs_W40_10', 'SVC_fs_W10_26', 'RF_w', 'Dummy'],
-    style='violinplot')
-
-ax32 = plt.subplot(gs3[1])
-sns.boxplot(data=res,
-            x='Prec',
-            y='Contrast',
-            ax=ax32)
-
-plt.show()
