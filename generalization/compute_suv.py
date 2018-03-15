@@ -14,8 +14,19 @@ read_subjects = []
 for subject in subjects:
     s_path = op.join(subj_path, subject)
     print(s_path)
-    if what == 'wSUV':
-        files = glob(op.join(s_path, '*wSUV.nii'))
+    conts = sorted([x.split('/')[-1] for x in glob(op.join(s_path, '*'))])
+    if 'PET_dicom' in conts:
+        print 'yeah'
+        dicom_fd = sorted([x.split('/')[-1] for x in glob(op.join(s_path, 'PET_dicom', '*'))])
+        if len(dicom_fd)<88:
+            print('No dicom files in {}' .format(subject))
+            continue
+        dataset = dicom.read_file(op.join(s_path, 'PET_dicom', dicom_fd[0]))
+        weight = dataset.PatientWeight
+        inj_time = dataset.Radi
+
+
+        st_fold = sorted([x.split('/')[-1] for x in glob(op.join(s_path, 'DICOM', 'PET*'))])
         if len(files) == 0:
             files = glob(op.join(s_path, '*wSUV.img'))
         if len(files) == 0:
