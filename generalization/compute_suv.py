@@ -22,8 +22,13 @@ for subject in subjects:
             print('No dicom files in {}' .format(subject))
             continue
         dataset = dicom.read_file(op.join(s_path, 'PET_dicom', dicom_fd[0]))
+
+
         weight = dataset.PatientWeight
-        inj_time = dataset.Radi
+        dose = dataset.RadiopharmaceuticalInformationSequence[0].RadionuclideTotalDose/1000000
+        weight/dose
+        suv_factor = dataset[0x7053,0x1000].value
+        inj_time = dataset.SUV
 
 
         st_fold = sorted([x.split('/')[-1] for x in glob(op.join(s_path, 'DICOM', 'PET*'))])
