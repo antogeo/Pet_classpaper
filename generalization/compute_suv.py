@@ -1,10 +1,19 @@
+import os
 import os.path as op
-import dicom
+import pydicom
 import numpy as np
 import pandas as pd
 from glob import glob
 
-subj_path = '/home/coma_meth/Documents/PET/pet_suv_db/Paris/subjects'
+if os.uname()[1] == 'antogeo-XPS':
+    db_path = '/home/antogeo/data/PET/pet_suv_db/'
+elif os.uname()[1] == 'comameth':
+    db_path = '/home/coma_meth/Documents/PET/pet_suv_db/'
+elif os.uname()[1] in ['mia.local', 'mia']:
+    db_path = '/Users/fraimondo/data/pet_suv_db/'
+
+subj_path = op.join(db_path, 'Paris/subjects')
+
 subjects = sorted(
         [x.split('/')[-1] for x in glob(op.join(subj_path, '*'))])
 
@@ -16,22 +25,21 @@ for subject in subjects:
     print(s_path)
     conts = sorted([x.split('/')[-1] for x in glob(op.join(s_path, '*'))])
     if 'PET_dicom' in conts:
-        print 'yeah'
-        dicom_fd = sorted([x.split('/')[-1] for x in glob(op.join(s_path, 'PET_dicom', '*'))])
-        if len(dicom_fd)<88:
+        print('yeah')
+        dicom_fd = sorted([x.split('/')[-1] for x in glob(
+            op.join(s_path, 'PET_dicom', '*'))])
+        if len(dicom_fd) < 88:
             print('No dicom files in {}' .format(subject))
             continue
         dataset = dicom.read_file(op.join(s_path, 'PET_dicom', dicom_fd[0]))
-
-
         weight = dataset.PatientWeight
-        dose = dataset.RadiopharmaceuticalInformationSequence[0].RadionuclideTotalDose/1000000
+        dose = dataset.RadiopharmaceuticalInformationSequence[
+            0].RadionuclideTotalDose / 1000000
         weight/dose
-        suv_factor = dataset[0x7053,0x1000].value
+        suv_factor = dataset[0x7053, 0x1000].value
         inj_time = dataset.SUV
-
-
-        st_fold = sorted([x.split('/')[-1] for x in glob(op.join(s_path, 'DICOM', 'PET*'))])
+        st_fold = sorted([x.split('/')[-1] for x in glob(
+            op.join(s_path, 'DICOM', 'PET*'))])
         if len(files) == 0:
             files = glob(op.join(s_path, '*wSUV.img'))
         if len(files) == 0:
@@ -43,7 +51,7 @@ for subject in subjects:
         images.append(this_image)
         read_subjects.append(subject)
     else:
-        raise ValueError('I do not know how to read {}'.format(what))
+        raise ValueError('No dicom folder {}'.format())
 
 logging.info(
     "Reading subjects' volume. Total number of subjects: {}"
