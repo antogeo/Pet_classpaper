@@ -50,4 +50,7 @@ def _compute_p_vals(df, column, ci=.95):
 
     return pd.DataFrame(results)
 
+
 p_vals = _compute_p_vals(all_diffs, 'Contrast')
+df = pd.DataFrame(p_vals)
+df.to_csv('p_values.csv')
