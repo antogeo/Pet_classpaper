@@ -1,4 +1,3 @@
-# plot scores
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -29,6 +28,7 @@ pypet.viz.plot_values(
     style='violinplot')
 
 ax2 = plt.subplot(gs[1])
+
 sns.boxplot(data=diff_df,
             x='AUC',
             y='Contrast',
