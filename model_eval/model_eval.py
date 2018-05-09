@@ -44,13 +44,13 @@ sss = StratifiedShuffleSplit(
 
 classifiers['SVC_fs_W40_10'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectPercentile(f_classif, 10.)),
+        ('select', SelectPercentile(f_classif, 90.)),
         ('clf', SVC(kernel="linear", C=1, probability=True,
                     class_weight={0: 1, 1: .25}))
     ])
 classifiers['SVC_fs_W10_26'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectPercentile(f_classif, 10.)),
+        ('select', SelectPercentile(f_classif, 90.)),
         ('clf', SVC(kernel="linear", C=1,  probability=True,
                     class_weight={0: 1, 1: 2.6}))
     ])
@@ -88,7 +88,7 @@ for t_iter, (train, test) in enumerate(sss.split(X, y)):
 
 
 df = pd.DataFrame(results)
-df.to_csv('data/models_eval.csv')
+df.to_csv('data/models_eval_90pcfeat.csv')
 
 fig_mean, axes = pypet.viz.plot_values(
     df,
