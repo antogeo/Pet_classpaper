@@ -1,0 +1,55 @@
+# do_create_suv_all.sh: Shell Script. calls python to create nifti images, both Raw and SUV, 
+# from dicoms and logs information
+
+subjects=()
+for t_s in /home/coma_meth/Documents/PET/pet_suv_db/Liege/subjects/*;
+do
+  subjects+=(${t_s:t})
+done
+parallel -j4 --joblog job-create-suv.log --resume --resume-failed --tag --delay 1 python do_create_suv.py --dbpath=/home/coma_meth/Documents/PET/pet_suv_db/Liege --subject={} ::: $subjects
+
+subjects=()
+for t_s in /home/coma_meth/Documents/PET/pet_suv_db/Paris/subjects/*;
+do
+  subjects+=(${t_s:t})
+done
+parallel -j4 --joblog job-create-suvParis.log --resume --resume-failed --tag --delay 1 python do_create_suv.py --dbpath=/home/coma_meth/Documents/PET/pet_suv_db/Paris --subject={} ::: $subjects
+
+
+__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+
+# this part is the only manula process. Niftis created before need to be reoriented according to a template
+# so that they are ready for spatial Normalization
+
+
+__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+
+# normalizesubjs.m: Normalize subjects. For both RAW and SUV images. Uses matlab & SPM
+# mni_norm.m: Normalizes images using HO PET template. 
+
+
+folder_name = uigetdir(fullfile(cur_path, 'subjects'));
+subj_name = dir(folder_name);
+tmplt = fullfile(cur_path, 'extra', 'st_sp_tmpl.nii');
+for i =3: size(subj_name, 1)
+    files = dir(fullfile(folder_name, subj_name(i).name));
+    % look for files containing keyword
+    subjs_suv = files(contains({files.name}, "nsSUV.nii"));
+    subjs_raw = files(contains({files.name}, "nsRAW.nii"));
+    if ~isempty(subjs_raw) || ~isempty(subjs_suv)
+        fprintf("Subject #%d \n", i-2);
+        new_folder = fullfile(folder_name, subj_name(i).name);
+        oldFolder = cd(new_folder);
+        mni_norm( ...
+            fullfile(folder_name, subj_name(i).name, subjs_suv.name), ...
+            {fullfile(folder_name, subj_name(i).name, subjs_suv.name); ...
+            fullfile(folder_name, subj_name(i).name, subjs_raw.name)})
+        cd(oldFolder)
+    end
+end
+
+
+__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
