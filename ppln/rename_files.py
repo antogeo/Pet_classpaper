@@ -3,11 +3,11 @@ import os.path as op
 from glob import glob
 
 if os.uname()[1] == 'antogeo-XPS':
-    db_path = '/home/antogeo/data/PET/pet_suv_db/Liege/subjects'
+    db_path = '/home/antogeo/data/PET/pet_suv_db/Paris/subjects'
 elif os.uname()[1] == 'comameth':
-    db_path = '/home/coma_meth/Documents/PET/pet_suv_db/Liege/subjects'
+    db_path = '/home/coma_meth/Documents/PET/pet_suv_db/Paris/subjects'
 elif os.uname()[1] in ['mia.local', 'mia']:
-    db_path = '/Users/fraimondo/data/pet_suv_db/Liege/subjects'
+    db_path = '/Users/fraimondo/data/pet_suv_db/Paris/subjects'
 
 subjects = sorted([op.basename(x) for x in glob(op.join(db_path, '*'))])
 

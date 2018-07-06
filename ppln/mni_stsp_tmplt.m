@@ -10,15 +10,16 @@
 clear; clc;
 [~,pc_name]= system('hostname');
 if regexp(string(pc_name), 'comameth')
-    db_path = '/home/coma_meth/Documents/PET/pet_suv_db/Liege/subjects';
+    db_path = '/home/coma_meth/Documents/PET/pet_suv_db/Paris/subjects';
 elseif regexp(pc_name, 'antogeo-XPS')
-    db_path = '/home/antogeo/data/PET/pet_suv_db/Liege/subjects';
+    db_path = '/home/antogeo/data/PET/pet_suv_db/Paris/subjects';
 elseif regexp(pc_name, 'antogeo')
     db_path = 'home/antogeo/Documents/';
 end
 
 subj_name = dir(db_path);
-tmplt = fullfile(db_path, 'extra', 'st_sp_tmpl.nii');
+[tmplt, path] = uigetfile({'.nii'}, '~data/PET/pet_db_suv/');
+tmplt = fullfile(path, tmplt);
 for i =3: size(subj_name, 1)
     files = dir(fullfile(db_path, subj_name(i).name));
     % look for files containing keyword
