@@ -18,8 +18,7 @@ for f_name in folders:
         op.join(db_path, f_name, 'subjects', '*')) if op.isdir(x)]
     for subject in subjects:
         nii = glob(
-            op.join(db_path, f_name, 'subjects', subject, '*_ns*.nii'))
+            op.join(db_path, f_name, 'subjects', subject, '*_w*.nii'))
         for img in nii:
             print(img)
             pre.smooth_img(img)
-            
