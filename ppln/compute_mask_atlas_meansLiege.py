@@ -10,7 +10,7 @@ elif os.uname()[1] == 'comameth':
 elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/Liege'
 
-results = 'results_SUV'
+results = 'group_results_SUV'
 
 meta_fname = op.join(db_path, 'extra', 'SUV_database10172017.xlsx')
 all_df = compute_regional_features(db_path, meta_fname)
