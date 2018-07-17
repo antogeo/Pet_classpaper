@@ -16,7 +16,7 @@ groups = ['Liege', 'Paris']
 
 for group in groups:
     all_df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                         group + '_db_GM_masks_atlas.csv'))
+                         group + '_db_GM_masks_full_atlas.csv'))
     vals = np.unique(all_df['Final diagnosis (behav)'])
     fig_GM, axes_GM = pypet.viz.plot_values(
         all_df,
