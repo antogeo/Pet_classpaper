@@ -3,6 +3,7 @@ import os.path as op
 import pypet
 import pypet.viz
 import pandas as pd
+import numpy as np
 
 
 if os.uname()[1] == 'antogeo-XPS':
@@ -17,7 +18,11 @@ groups = ['Liege', 'Paris']
 for group in groups:
     all_df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
                          group + '_db_GM_masks_full_atlas.csv'))
+    if 'Final diagnosis (behav)' not in all_df:
+        all_df['Final diagnosis (behav)'] = 'to test'
+
     vals = np.unique(all_df['Final diagnosis (behav)'])
+
     fig_GM, axes_GM = pypet.viz.plot_values(
         all_df,
         values='GMIndex', target='Final diagnosis (behav)',
