@@ -19,6 +19,6 @@ for group in groups:
         all_df['Final diagnosis (behav)'] == 'CTRL']['GMIndex'].mean() + \
         3 * all_df[
             all_df['Final diagnosis (behav)'] == 'CTRL']['GMIndex'].std()
-    all_df['QC_PASS'] = np.where(all_df['GMIndex'] > thresh, '1', '0')
+    all_df['QC_PASS'] = all_df['GMIndex'] < thresh
     all_df.to_csv(op.join(db_path, group, 'group_results_SUV',
                           group + '_db_GM_masks_full_atlas.csv'))
