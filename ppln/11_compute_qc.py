@@ -1,7 +1,6 @@
 import os
 import os.path as op
 import pandas as pd
-import numpy as np
 
 if os.uname()[1] == 'antogeo-XPS':
     db_path = '/home/antogeo/data/PET/pet_suv_db/'
