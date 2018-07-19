@@ -15,8 +15,8 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 groups = ['Liege']
 
 for group in groups:
-    meta_fname = op.join(db_path, group, 'extra', group + '_meta.csv')
-    df = pd.read_csv(meta_fname, index_col=False)
+    meta_fname = op.join(db_path, group, 'extra', group + '_meta.xls')
+    df = pd.read_excel(meta_fname, index_col=False)
     # patients = df.query('Final diagnosis (behav) != CTRL')
     patients = df.replace(
             {'Final diagnosis (behav)': {'MCS*': 'VS'}})
@@ -39,7 +39,7 @@ for group in groups:
     df = df.set_index('Code')
     df = df['ML_VALIDATION']
 
-    old_df = pd.read_csv(meta_fname)
+    old_df = pd.read_excel(meta_fname)
     old_df = old_df.set_index('Code')
 
     old_df = old_df.join(df)
