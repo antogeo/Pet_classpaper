@@ -45,4 +45,4 @@ for group in groups:
     old_df = old_df.join(df)
 
     old_df.to_csv(op.join(
-                  db_path, group, 'group_results_SUV', group + '_meta.csv'))
+                  db_path, group, 'extra', group + '_meta.csv'))
