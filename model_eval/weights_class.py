@@ -27,8 +27,10 @@ elif os.uname()[1] == 'comameth':
 elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
 
-meta_fname = op.join(db_path, 'extra', 'SUV_database10172017_2.xlsx')
-df = compute_regional_features(db_path, meta_fname)
+group = 'Liege'
+
+df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
+                 group + '_db_GM_masks_atlas.csv'))
 df = df.query('QC_PASS == True and ML_VALIDATION == False')
 
 weight_val = np.arange(1, 10, .2)
