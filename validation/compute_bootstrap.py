@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import os
-import os.path as op
 from sklearn.utils import resample
 from sklearn.svm import SVC
 from sklearn.dummy import DummyClassifier
@@ -12,8 +11,6 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.feature_selection import f_classif, SelectPercentile
 from collections import OrderedDict
 
-from pypet.features import compute_regional_features
-
 # load dataset
 if os.uname()[1] == 'antogeo-XPS':
     db_path = '/home/antogeo/data/PET/pet_suv_db/'
@@ -22,8 +19,7 @@ elif os.uname()[1] == 'comameth':
 elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
 
-meta_fname = op.join(db_path, 'extra', 'SUV_database10172017_2.xlsx')
-df = compute_regional_features(db_path, meta_fname)
+df = pd.read_csv('group_results_SUV/Liege_db_GM_masks_atlas.csv')
 df_train = df.query('QC_PASS == True and ML_VALIDATION == False')
 df_val = df.query('QC_PASS == True and ML_VALIDATION == True')
 
@@ -33,19 +29,19 @@ classifiers['SVC_fs_W40_10'] = Pipeline([
         ('scaler', RobustScaler()),
         ('select', SelectPercentile(f_classif, 10.)),
         ('clf', SVC(kernel="linear", C=1, probability=True,
-                    class_weight={0: 1, 1: .25}))
+                    class_weight={0: .8, 1: .2}))
     ])
 classifiers['SVC_fs_W10_26'] = Pipeline([
         ('scaler', RobustScaler()),
         ('select', SelectPercentile(f_classif, 10.)),
         ('clf', SVC(kernel="linear", C=1,  probability=True,
-                    class_weight={0: 1, 1: 2.6}))
+                    class_weight={0: .28, 1: .72}))
     ])
 classifiers['RF_w'] = Pipeline([
     ('scaler', RobustScaler()),
     ('clf', RandomForestClassifier(
         max_depth=5, n_estimators=2000, max_features='auto',
-        class_weight={0: 1, 1: .7}))
+        class_weight={0: .59, 1: .41}))
 ])
 classifiers['Dummy'] = Pipeline([
         ('clf', DummyClassifier(strategy="stratified"))
@@ -118,4 +114,4 @@ for i in range(t_iter):
 
 
 df = pd.DataFrame(results)
-df.to_csv('corrected_boot_1000.csv')
+df.to_csv('group_results_SUV/bootstrap_1000.csv')
