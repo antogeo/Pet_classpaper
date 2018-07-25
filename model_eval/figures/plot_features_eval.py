@@ -1,9 +1,7 @@
-import os
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
 import seaborn as sns
-import pypet
+
 
 df = pd.read_csv(
     '/home/antogeo/codes/PET_class/result_dfs/feature_eval_SVC.csv')
@@ -22,3 +20,15 @@ sns.despine(fig=g.fig, left=True)
 plt.show()
 fig1 = plt.gcf()
 fig1.savefig('feature_eval_plot.pdf')
+
+# OR this code:
+
+fig, axes = plt.subplots(1, 3, figsize=(12, 6))
+sns.lineplot(
+    x="perc", y="Recall", data=df, ax=axes[0])
+sns.lineplot(
+    x="perc", y="Precision", data=df, ax=axes[1])
+sns.lineplot(
+    x="perc", y="AUC", data=df, ax=axes[2])
+# plt.savefig('figures/model_compar_box.pdf')
+plt.show()
