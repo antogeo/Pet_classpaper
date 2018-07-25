@@ -21,7 +21,7 @@ subj_name = dir(db_path);
 [tmplt, path] = uigetfile({'.nii'}, '~data/PET/pet_db_suv/');
 tmplt = fullfile(path, tmplt);
 for i =3: size(subj_name, 1)
-    files = dir(fullfile(db_path, subj_name(i).name));
+    files = dir(fullfile(db_path, subj_name(i).name, 'niftis'));
     % look for files containing keyword
     subjs_suv = files(contains({files.name}, "nsSUV.nii"));
     subjs_raw = files(contains({files.name}, "nsRAW.nii"));
