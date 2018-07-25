@@ -27,20 +27,20 @@ classifiers = OrderedDict()
 
 classifiers['SVC_fs_W40_10'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectPercentile(f_classif, 10.)),
+        ('select', SelectPercentile(f_classif, 20.)),
         ('clf', SVC(kernel="linear", C=1, probability=True,
                     class_weight={0: .8, 1: .2}))
     ])
 classifiers['SVC_fs_W10_26'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectPercentile(f_classif, 10.)),
+        ('select', SelectPercentile(f_classif, 20.)),
         ('clf', SVC(kernel="linear", C=1,  probability=True,
                     class_weight={0: .28, 1: .72}))
     ])
 classifiers['RF_w'] = Pipeline([
     ('scaler', RobustScaler()),
     ('clf', RandomForestClassifier(
-        max_depth=5, n_estimators=2000, max_features='auto',
+        max_depth=10, n_estimators=2000, max_features='auto',
         class_weight={0: .59, 1: .41}))
 ])
 classifiers['Dummy'] = Pipeline([
@@ -97,6 +97,7 @@ for i in range(t_iter):
 
     for clf_name, clf in classifiers.items():
         # Predict the test set
+        clf.fit(X_train, y_train)
         y_pred_proba = clf.predict_proba(X_test)[:, 1]
         y_pred_class = clf.predict(X_test)
 
@@ -114,4 +115,4 @@ for i in range(t_iter):
 
 
 df = pd.DataFrame(results)
-df.to_csv('group_results_SUV/bootstrap_1000.csv')
+df.to_csv('group_results_SUV/20pc_10dp_bootstrap_1000.csv')
