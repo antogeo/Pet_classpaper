@@ -39,14 +39,14 @@ results['AUC'] = []
 results['Precision'] = []
 results['Recall'] = []
 
-for perc in range(1, 11, 1):
+for perc in range(10, 101, 10):
     sss = StratifiedShuffleSplit(
         n_splits=100, test_size=0.3, random_state=42)
     for t_iter, (train, test) in enumerate(sss.split(X, y)):
-        print(perc/10)
+        print(perc/100)
         clf = Pipeline([
             ('scaler', RobustScaler()),
-            ('select', SelectPercentile(f_classif, perc/10)),
+            ('select', SelectPercentile(f_classif, perc/100)),
             ('clf', SVC(kernel="linear", C=1,  probability=True))
             ])
         print('Iteration {}'.format(t_iter))
@@ -62,7 +62,7 @@ for perc in range(1, 11, 1):
         rec_score = recall_score(y_test, y_pred_class)
 
         results['Iteration'].append(t_iter)
-        results['perc'].append(perc/10)
+        results['perc'].append(perc/100)
         results['AUC'].append(auc_score)
         results['Precision'].append(prec_score)
         results['Recall'].append(rec_score)

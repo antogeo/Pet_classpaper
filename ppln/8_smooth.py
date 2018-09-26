@@ -19,6 +19,6 @@ for f_name in folders:
     for subject in subjects:
         nii = glob(
             op.join(db_path, f_name, 'subjects', subject, '*_w*.nii'))
-        for img in nii:
-            print(img)
-            pre.smooth_img(img)
+        for img_fname in nii:
+            print(img_fname)
+            pre.smooth_img(img_fname)

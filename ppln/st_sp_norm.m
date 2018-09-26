@@ -1,4 +1,4 @@
-function arg1 = sec_norm(ref_img, mov_img, tmplt)
+function arg1 = st_sp_norm(ref_img, mov_img, tmplt)
 
   spm_jobman('initcfg');
 

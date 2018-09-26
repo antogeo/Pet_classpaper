@@ -22,7 +22,9 @@ meta_fname = op.join(db_path, 'extra', 'SUV_database10172017.xlsx')
 subjects = sorted([op.basename(x) for x in glob(
                    op.join(db_path, 'subjects', '*'))])
 metadata = pypet.io.read_metadata(subjects, meta_fname)
-subj_list = metadata.loc[metadata['ML_VALIDATION'] == 0, 'Code']
+# subj_list = metadata.loc[metadata['ML_VALIDATION'] == 0, 'Code']
+subj_list = metadata.query('ML_VALIDATION == 0')['Code'].values
+
 img_list = []
 i = 0
 for subject in subj_list:
