@@ -1,10 +1,17 @@
+import os
+import os.path as op
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df = pd.read_csv('/home/antogeo/codes/Pet_classpaper/group_results_SUV/ \
-    Liege_weight_eval.csv')
+if os.uname()[1] == 'antogeo-XPS':
+    db_path = '/home/antogeo/codes/Pet_classpaper/'
+elif os.uname()[1] == 'comameth':
+    db_path = '/home/coma_meth/Documents/antogeo/git_codes/Pet_classpaper/'
+elif os.uname()[1] in ['mia.local', 'mia']:
+    db_path = 'Add git repo'
 
+df = pd.read_csv(op.join(db_path, 'group_results_SUV/Liege_weight_eval.csv'))
 
 classif = ['SVC_fs20p', 'SVC_fs10p', 'RF_w']
 
@@ -25,3 +32,4 @@ ax.tick_params(axis='x', direction='out', length=3, width=1, grid_color='r',
 # # ax.set_aspect('equal', axis='x', adjustable='datalim')
 # # ax.xaxis.set_major_locator(ticker.MultipleLocator(10))
 # ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%2.2f'))
+plt.show()

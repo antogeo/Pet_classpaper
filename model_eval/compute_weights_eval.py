@@ -3,22 +3,16 @@ import os.path as op
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
-import pypet
 from collections import OrderedDict
-from sklearn.model_selection import (StratifiedKFold, StratifiedShuffleSplit,
-                                     cross_val_score)
-from pypet.features import compute_regional_features
+from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.dummy import DummyClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
-from sklearn.metrics import (roc_auc_score, precision_recall_curve,
-                             classification_report, precision_score,
-                             recall_score)
-from sklearn.feature_selection import SelectKBest, f_classif, SelectPercentile
+from sklearn.metrics import (roc_auc_score, precision_score, recall_score)
+from sklearn.feature_selection import f_classif, SelectPercentile
 
 if os.uname()[1] == 'antogeo-XPS':
     db_path = '/home/antogeo/data/PET/pet_suv_db/'
@@ -34,7 +28,7 @@ df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
 df = df.query('QC_PASS == True and ML_VALIDATION == False')
 
 weight_val = np.arange(1, 10, .2)
-weight_val = sorted(np.concatenate((1 / weight_val, weight_val)))
+weight_val = sorted(np.concatenate(([1 / x for x in weight_val], weight_val)))
 
 classifiers = OrderedDict()
 
@@ -105,23 +99,3 @@ df.to_csv(
 cw_mcs = np.sum(y)/y.shape[0]
 float(np.sum(y)) / y.shape[0]
 float(y.shape[0] - np.sum(y)) / y.shape[0]
-
-classif = ['SVC_fs20p', 'SVC_fs10p', 'RF_w']
-
-fig, ax = plt.subplots(1, 1)
-paper_rc = {'lines.linewidth': .6, 'lines.markersize': 6}
-sns.set_context("paper", rc=paper_rc)
-df['Weight Val'] = df['Weight Val'].round(4)
-sns.pointplot(x="Weight Val", y="Recall", hue="Classifier", data=df, ax=ax,
-                hue_order=classif)
-sns.pointplot(x="Weight Val", y="Precision", hue="Classifier", data=df, ax=ax,
-                hue_order=classif)
-sns.pointplot(x="Weight Val", y="AUC", hue="Classifier", data=df, ax=ax,
-                hue_order=classif)
-
-ax.legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.)
-ax.tick_params(axis='x', direction='out', length=3, width=1, grid_color='r',
-               labelrotation=90, grid_alpha=0.5)
-# # ax.set_aspect('equal', axis='x', adjustable='datalim')
-# # ax.xaxis.set_major_locator(ticker.MultipleLocator(10))
-# ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%2.2f'))
