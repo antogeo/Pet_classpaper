@@ -19,5 +19,6 @@ for folder in folders:
     all_df = compute_regional_features(s_path, meta_fname, ftype='s8SUV')
     print('{} {}'.format(s_path, meta_fname))
     dframe = pd.DataFrame(all_df)
+    dframe = dframe.reset_index(drop=True)
     dframe.to_csv(op.join(
         db_path, folder, results, folder + '_db_GM_masks_atlas.csv'))
