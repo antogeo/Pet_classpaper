@@ -78,4 +78,4 @@ for metric, color in zip(metrics, colors):
                   color=color)
 
 results_df.to_csv(op.join(db_path, 'Liege', 'group_results_SUV',
-                          'Liege' + 'feature_eval_01SVC.csv'))
+                          'Liege' + 'feature_eval_005SVC.csv'))
