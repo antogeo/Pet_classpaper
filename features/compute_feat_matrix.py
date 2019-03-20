@@ -8,6 +8,7 @@ from sklearn.model_selection import LeaveOneOut
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
+from scipy.spatial.distance import pdist, squareform
 
 if os.uname()[1] == 'antogeo-XPS':
     db_path = '/home/antogeo/data/PET/pet_suv_db/'
@@ -34,7 +35,6 @@ classifiers['lr'] = Pipeline([
         ('clf', LogisticRegression())
     ])
 
-iter = 2
 results = dict()
 results['clf'] = []
 results['feature'] = []
@@ -61,5 +61,10 @@ for train, test in loo.split(X):
             results['proba'].append(y_proba)
             results['lbl'].append(y[test])
 
+
+sim_mat = pdist(results['score'], metric='minkowski', p=1)
+DF_euclid = pd.DataFrame(squareform(sim_mat), columns=markers, index=markers)
 df_res = pd.DataFrame(results)
+mat = df_res[['feature', 'score', 'subj']].pivot(
+    values='score', index='feature', columns='subj')
 df.to_csv('../group_results_SUV/feat_similarity_mat.csv')
