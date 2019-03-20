@@ -1,3 +1,4 @@
+#!/usr/bin/env      python
 import os
 import os.path as op
 import numpy as np
@@ -61,4 +62,4 @@ for train, test in loo.split(X):
             results['lbl'].append(y[test])
 
 df_res = pd.DataFrame(results)
-df.to_csv('./group_results_SUV/feat_similarity_mat.csv')
+df.to_csv('../group_results_SUV/feat_similarity_mat.csv')
