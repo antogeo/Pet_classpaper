@@ -79,7 +79,7 @@ for iter in range(iters):
                 # y_proba = clf.predict_proba(X_test.reshape(-1, 1))[:, 1]
                 y_score = clf.predict(X_test.reshape(-1, 1))
                 for test_num, test_ind in enumerate(test):
-                    print(test_num)
+                    # print(test_num)
                     subj_feat[iter, f_num, test_ind] = y_score[test_num]
                 # # results['clf'].append(clf_name)
                 # results['feature'].append(feature)
@@ -101,9 +101,10 @@ for i in range(X.shape[1]):
         # print(i, j)
         for x in range(X.shape[0]):
             sim_mat[i, j] = sim_mat[i, j] + np.abs(
-                1 - normed_feat[i, x] - normed_feat[j, x])
+                normed_feat[i, x] - normed_feat[j, x])
         sim_mat[j, i] = sim_mat[i, j]
 
 df_sim = pd.DataFrame(sim_mat, index=ord_markers, columns=ord_markers)
-sns.heatmap(df_sim)
+sns.heatmap(df_sim, cbar_kws={
+    'label': 'pairwise discrepancy in subjects lassification'})
 df_sim.to_csv('../group_results_SUV/feat_similarity_mat.csv')

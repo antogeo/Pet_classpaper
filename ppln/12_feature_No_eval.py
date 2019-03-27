@@ -8,7 +8,8 @@ from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
 from sklearn.metrics import (roc_auc_score, precision_score, recall_score)
-from sklearn.feature_selection import f_classif, SelectPercentile
+from sklearn.feature_selection import f_classif, SelectKBest
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 if os.uname()[1] == 'antogeo-XPS':
@@ -32,23 +33,22 @@ y = (df['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
 
 results = dict()
 results['Iteration'] = []
-results['perc'] = []
+results['feat_num'] = []
 results['AUC'] = []
 results['Precision'] = []
 results['Recall'] = []
-percs = np.arange(.05, 1.05, .05)
-for perc in percs:
-    print(perc)
+for feat_num in range(1, X.shape[1]):
+    print(feat_num)
     sss = StratifiedShuffleSplit(
-        n_splits=100, test_size=0.3, random_state=42)
+        n_splits=100, test_size=0.3, random_state=feat_num)
     for t_iter, (train, test) in enumerate(sss.split(X, y)):
-        print(t_iter)
+        # print(t_iter)
         clf = Pipeline([
             ('scaler', RobustScaler()),
-            ('select', SelectPercentile(f_classif, perc)),
+            ('select', SelectKBest(f_classif, feat_num)),
             ('clf', SVC(kernel="linear", C=1,  probability=True))
             ])
-        print('Iteration {}'.format(t_iter))
+        # print('Iteration {}'.format(t_iter))
         X_train, X_test = X[train], X[test]
         y_train, y_test = y[train], y[test]
         clf.fit(X_train, y_train)
@@ -61,21 +61,18 @@ for perc in percs:
         rec_score = recall_score(y_test, y_pred_class)
 
         results['Iteration'].append(t_iter)
-        results['perc'].append(perc)
+        results['feat_num'].append(feat_num)
         results['AUC'].append(auc_score)
         results['Precision'].append(prec_score)
         results['Recall'].append(rec_score)
 
-results['perc'] = np.round(results['perc'], decimals=2)
 results_df = pd.DataFrame(results)
 
-metrics = ['AUC', 'Precision', 'Recall']
-colors = ['red', 'green', 'blue']
+# metrics = ['AUC', 'Precision', 'Recall']
+# colors = ['red', 'green', 'blue']
 fig, ax = plt.subplots(1, 1)
 
-for metric, color in zip(metrics, colors):
-    sns.pointplot(x="perc", y=metric, data=results_df,  estimator=np.mean,
-                  color=color)
+sns.lineplot(x="feat_num", y='AUC', data=results_df, color='red')
 
 results_df.to_csv(op.join(db_path, 'Liege', 'group_results_SUV',
-                          'Liege' + 'feature_eval_005SVC.csv'))
+                          'Liege' + 'feature_eval_KbestSVC.csv'))
