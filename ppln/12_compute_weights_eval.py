@@ -13,7 +13,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
 from sklearn.metrics import (roc_auc_score, precision_score,
                              recall_score)
-from sklearn.feature_selection import f_classif, SelectPercentile
+from sklearn.feature_selection import f_classif, SelectKBest
 
 if os.uname()[1] == 'antogeo-XPS':
     db_path = '/home/antogeo/data/PET/pet_suv_db/'
@@ -52,13 +52,13 @@ for t_iter, (train, test) in enumerate(sss.split(X, y)):
     for val in weight_val:
         classifiers['SVC_fs20p'] = Pipeline([
                 ('scaler', RobustScaler()),
-                ('select', SelectPercentile(f_classif, 20.)),
+                ('select', SelectKBest(f_classif, 20)),
                 ('clf', SVC(kernel="linear", C=1,  probability=True,
                             class_weight={0: 1, 1: val}))
             ])
         classifiers['SVC_fs10p'] = Pipeline([
                 ('scaler', RobustScaler()),
-                ('select', SelectPercentile(f_classif, 10.)),
+                ('select', SelectKBest(f_classif, 10)),
                 ('clf', SVC(kernel="linear", C=1,  probability=True,
                             class_weight={0: 1, 1: val}))
             ])
@@ -96,7 +96,7 @@ for t_iter, (train, test) in enumerate(sss.split(X, y)):
 
 df = pd.DataFrame(results)
 
-classif = ['SVC_fs20p', 'SVC_fs10p', 'RF_w']
+classif = ['SVC_fs20p', 'SVC_fs10p']
 
 fig, ax = plt.subplots(1, 1)
 paper_rc = {'lines.linewidth': .6, 'lines.markersize': 6}
@@ -113,4 +113,4 @@ ax.legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.)
 ax.tick_params(axis='x', direction='out', length=3, width=1, grid_color='r',
                labelrotation=90, grid_alpha=0.5)
 
-df.to_csv('./group_results_SUV/weights_eval.csv')
+df.to_csv('./group_results_SUV/weights_eval_10.csv')
