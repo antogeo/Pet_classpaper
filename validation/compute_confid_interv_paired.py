@@ -6,7 +6,7 @@ import pypet
 import seaborn as sns
 import matplotlib.gridspec as gridspec
 
-df = pd.read_csv('validation/data/corrected_boot_1000.csv',
+df = pd.read_csv('group_results_SUV/svc10_rf10_boot1000_0328.csv',
                  index_col=['Iteration', 'Classifier'])[
                     ['AUC', 'Precision', 'Recall']]
 
@@ -27,7 +27,7 @@ for cl1 in classifiers:
 all_diffs = pd.concat(diffs)
 
 
-# all_diffs.to_csv('Clfs_contrasts.csv')
+all_diffs.to_csv('group_results_SUV/Clfs_contrast_svc10rf10.csv')
 
 def _compute_p_vals(df, column, ci=.95):
     p_low = ((1.0 - ci) / 2.0) * 100
