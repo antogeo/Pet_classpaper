@@ -1,11 +1,13 @@
 import numpy as np
 import pandas as pd
 import os
-from sklearn.utils import resample
+import os.path as op
+from sklearn.model_selection import StratifiedShuffleSplit, cross_validate
+from sklearn.metrics import (make_scorer, roc_auc_score, precision_score,
+                             recall_score)
 from sklearn.svm import SVC
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import (roc_auc_score, precision_score, recall_score)
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
 from sklearn.feature_selection import f_classif, SelectPercentile
@@ -19,9 +21,15 @@ elif os.uname()[1] == 'comameth':
 elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
 
-df = pd.read_csv('group_results_SUV/Liege_db_GM_masks_atlas.csv')
-df_train = df.query('QC_PASS == True and ML_VALIDATION == False')
-df_val = df.query('QC_PASS == True and ML_VALIDATION == True')
+group = 'Liege'
+
+df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
+                 group + '_db_GM_masks_atlas.csv'))
+df = df.query('QC_PASS == True and ML_VALIDATION == False')
+
+scoring = {'AUC': 'roc_auc',
+           'rec': 'recall',
+           'prec': 'precision'}
 
 classifiers = OrderedDict()
 
@@ -33,7 +41,7 @@ classifiers['SVC_rec'] = Pipeline([
     ])
 classifiers['SVC_prec'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectPercentile(f_classif,10.)),
+        ('select', SelectPercentile(f_classif, 10.)),
         ('clf', SVC(kernel="linear", C=1,  probability=True,
                     class_weight={0: 1, 1: .46}))
     ])
@@ -48,71 +56,16 @@ classifiers['Dummy'] = Pipeline([
     ])
 
 markers = [x for x in df.columns if 'aal' in x]
-X_train = df_train[markers].values
-y_train = 1 - (
-    df_train['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
+X = df[markers].values
+y = 1 - (df['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
 
-# configure bootstrap
-t_iter = 1000
+scores_f = {'auc': make_scorer(roc_auc_score),
+            'precision': make_scorer(precision_score),
+            'recall': make_scorer(recall_score)}
+sss = StratifiedShuffleSplit(n_splits=1000, test_size=0.3, random_state=23)
+scores = dict()
+for clf_name, clf in classifiers.items():
+    scores = cross_validate(clf, X, y, cv=sss, scoring=scores_f,
+                            return_train_score=True)
 
-y_val = 1 - (df_val['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
-sizes = [np.sum(y_val == 0), np.sum(y_val == 1)]
-
-# run bootstrap
-
-results = dict()
-results['Iteration'] = []
-results['Classifier'] = []
-results['AUC'] = []
-results['Precision'] = []
-results['Recall'] = []
-
-predictions = dict()
-predictions['Patient'] = []
-predictions['Classifier'] = []
-predictions['Label'] = []
-#
-# for clf_name, clf in classifiers.items():
-#     # Fit the model on the training set\
-#     print(clf_name, clf)
-#     clf.fit(X_train, y_train)
-#     probas = clf.predict_proba(X_train)[:, 1]
-#     auc_score = roc_auc_score(y_train, probas)
-#     print('In sample AUC: {}'.format(auc_score))
-
-
-for i in range(t_iter):
-    # prepare train and test sets
-    df_test_vs = resample(
-        df_val[y_val == 0], n_samples=sizes[0], random_state=i)
-    df_test_mcs = resample(
-        df_val[y_val == 1], n_samples=sizes[1], random_state=i)
-
-    df_test = df_test_vs.append(df_test_mcs)
-
-    X_test = df_test[markers].values
-    y_test = 1 - (
-        df_test['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
-    # fit model
-
-    for clf_name, clf in classifiers.items():
-        # Predict the test set
-        clf.fit(X_train, y_train)
-        y_pred_proba = clf.predict_proba(X_test)[:, 1]
-        y_pred_class = clf.predict(X_test)
-
-        auc_score = roc_auc_score(y_test, y_pred_proba)
-        prec_score = precision_score(y_test, y_pred_class)
-        rec_score = recall_score(y_test, y_pred_class)
-
-        results['Iteration'].append(i)
-        results['Classifier'].append(clf_name)
-        results['AUC'].append(auc_score)
-        results['Precision'].append(prec_score)
-        results['Recall'].append(rec_score)
-        print('Iter {} Clf = {} AUC = {} Prec = {} Rec = {}'.format(
-            i, clf_name, auc_score, prec_score, rec_score))
-
-
-df = pd.DataFrame(results)
-df.to_csv('group_results_SUV/svc10_rf_boot1000_0328.csv')
+df = pd.DataFrame(scores)
