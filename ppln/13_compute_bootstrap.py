@@ -2,9 +2,8 @@ import numpy as np
 import pandas as pd
 import os
 import os.path as op
-from sklearn.model_selection import StratifiedShuffleSplit, cross_validate
-from sklearn.metrics import (make_scorer, roc_auc_score, precision_score,
-                             recall_score)
+from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.metrics import roc_auc_score, precision_score, recall_score
 from sklearn.svm import SVC
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -12,6 +11,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
 from sklearn.feature_selection import f_classif, SelectPercentile
 from collections import OrderedDict
+
 
 # load dataset
 if os.uname()[1] == 'antogeo-XPS':
@@ -26,10 +26,6 @@ group = 'Liege'
 df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
                  group + '_db_GM_masks_atlas.csv'))
 df = df.query('QC_PASS == True and ML_VALIDATION == False')
-
-scoring = {'AUC': 'roc_auc',
-           'rec': 'recall',
-           'prec': 'precision'}
 
 classifiers = OrderedDict()
 
@@ -59,13 +55,40 @@ markers = [x for x in df.columns if 'aal' in x]
 X = df[markers].values
 y = 1 - (df['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
 
-scores_f = {'auc': make_scorer(roc_auc_score),
-            'precision': make_scorer(precision_score),
-            'recall': make_scorer(recall_score)}
-sss = StratifiedShuffleSplit(n_splits=1000, test_size=0.3, random_state=23)
-scores = dict()
-for clf_name, clf in classifiers.items():
-    scores = cross_validate(clf, X, y, cv=sss, scoring=scores_f,
-                            return_train_score=True)
+results = dict()
+results['Iteration'] = []
+results['Recall'] = []
+results['Precision'] = []
+results['AUC'] = []
+results['Classifier'] = []
+feat_sel = []
 
-df = pd.DataFrame(scores)
+sss = StratifiedShuffleSplit(
+   n_splits=5, test_size=0.3, random_state=30)
+for iter, (train_ind, test_ind) in enumerate(sss.split(X, y)):
+    for clf_name, clf in classifiers.items():
+        clf.fit(X[train_ind], y[train_ind])
+        y_pred_class = clf.predict(X[test_ind])
+        y_pred_proba = clf.predict_proba(X[test_ind])[:, 0]
+        auc_score = roc_auc_score(y[test_ind], y_pred_proba)
+        prec_score = precision_score(y[test_ind], y_pred_class)
+        rec_score = recall_score(y[test_ind], y_pred_class)
+
+        results['Iteration'].append(iter)
+        results['Classifier'].append(clf_name)
+        results['AUC'].append(auc_score)
+        results['Precision'].append(prec_score)
+        results['Recall'].append(rec_score)
+        if 'select' in clf.named_steps:
+            print('saving features for {} iter {}'.format(clf_name, iter))
+            feat_sel.append(
+                clf.named_steps['select'].get_support(indices=True))
+
+        # results[clf_name] = cross_validate(
+        #   clf, X, y, cv=sss, scoring=scores_f,
+        #   return_train_score=True, n_jobs=4)
+
+unique, counts = np.unique(feat_sel, return_counts=True)
+dict(zip(unique, counts))
+
+df = pd.DataFrame(results)
