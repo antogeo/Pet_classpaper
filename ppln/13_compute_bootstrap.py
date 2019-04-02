@@ -55,6 +55,8 @@ markers = [x for x in df.columns if 'aal' in x]
 X = df[markers].values
 y = 1 - (df['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
 
+sss = StratifiedShuffleSplit(
+    n_splits=1000, test_size=0.3, random_state=30)
 results = dict()
 results['Iteration'] = []
 results['Recall'] = []
@@ -62,9 +64,7 @@ results['Precision'] = []
 results['AUC'] = []
 results['Classifier'] = []
 feat_sel = []
-
-sss = StratifiedShuffleSplit(
-   n_splits=5, test_size=0.3, random_state=30)
+feat_rank = []
 for iter, (train_ind, test_ind) in enumerate(sss.split(X, y)):
     for clf_name, clf in classifiers.items():
         clf.fit(X[train_ind], y[train_ind])
@@ -83,14 +83,16 @@ for iter, (train_ind, test_ind) in enumerate(sss.split(X, y)):
             print('saving features for {} iter {}'.format(clf_name, iter))
             feat_sel.append(
                 clf.named_steps['select'].get_support(indices=True))
-
+            feat_rank.append(dict(zip(markers, -np.log10(
+                clf.named_steps['select'].pvalues_))))
         # results[clf_name] = cross_validate(
         #   clf, X, y, cv=sss, scoring=scores_f,
         #   return_train_score=True, n_jobs=4)
 
 unique, counts = np.unique(feat_sel, return_counts=True)
-dict(zip(unique, counts))
-
+feats = dict(zip(unique, counts))
+df_feat = pd.DataFrame(feat_rank)
 df_res = pd.DataFrame(results)
-pd.to_csv('./group_results_SUV/performance_estimate_1000iter.csv')
-pd.to_csv('./group_results_SUV/selected_features.csv')
+df_feat.to_csv('./group_results_SUV/feat_rank.csv')
+df_res.to_csv('./group_results_SUV/performance_estimate_1000iter.csv')
+feats.to_csv('./group_results_SUV/selected_features.csv')
