@@ -91,4 +91,6 @@ for iter, (train_ind, test_ind) in enumerate(sss.split(X, y)):
 unique, counts = np.unique(feat_sel, return_counts=True)
 dict(zip(unique, counts))
 
-df = pd.DataFrame(results)
+df_res = pd.DataFrame(results)
+pd.to_csv('./group_results_SUV/performance_estimate_1000iter.csv')
+pd.to_csv('./group_results_SUV/selected_features.csv')
