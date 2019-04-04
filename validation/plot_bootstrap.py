@@ -5,19 +5,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pypet
 # %matplotlib
-df = pd.read_csv('data/corrected_boot_1000.csv',
+df = pd.read_csv('group_results_SUV/svc10_rf10_boot1000_0328.csv',
                  index_col=['Iteration', 'Classifier'])[
                     ['AUC', 'Precision', 'Recall']]
 
-SVM_AUC = df.loc[df['Classifier'] == 'SVC_fs_W40_10', 'AUC']
-SVM_rec = df.loc[df['Classifier'] == 'SVC_fs_W40_10', 'Recall']
-SVM_prec = df.loc[df['Classifier'] == 'SVC_fs_W40_10', 'Precision']
-SVM2_AUC = df.loc[df['Classifier'] == 'SVC_fs_W10_26', 'AUC']
-SVM2_rec = df.loc[df['Classifier'] == 'SVC_fs_W10_26', 'Recall']
-SVM2_prec = df.loc[df['Classifier'] == 'SVC_fs_W10_26', 'Precision']
-RF_AUC = df.loc[df['Classifier'] == 'RF_w', 'AUC']
-RF_rec = df.loc[df['Classifier'] == 'RF_w', 'Recall']
-RF_prec = df.loc[df['Classifier'] == 'RF_w', 'Precision']
+SVM_AUC = df.loc[df['Classifier'] == 'SVC_rec', 'AUC']
+SVM_rec = df.loc[df['Classifier'] == 'SVC_rec', 'Recall']
+SVM_prec = df.loc[df['Classifier'] == 'SVC_rec', 'Precision']
+SVM2_AUC = df.loc[df['Classifier'] == 'SVC_prec', 'AUC']
+SVM2_rec = df.loc[df['Classifier'] == 'SVC_prec', 'Recall']
+SVM2_prec = df.loc[df['Classifier'] == 'SVC_prec', 'Precision']
+RF_AUC = df.loc[df['Classifier'] == 'RF', 'AUC']
+RF_rec = df.loc[df['Classifier'] == 'RF', 'Recall']
+RF_prec = df.loc[df['Classifier'] == 'RF', 'Precision']
 Dummy_AUC = df.loc[df['Classifier'] == 'Dummy', 'AUC']
 Dummy_rec = df.loc[df['Classifier'] == 'Dummy', 'Recall']
 Dummy_prec = df.loc[df['Classifier'] == 'Dummy', 'Precision']
