@@ -21,4 +21,4 @@ for folder in folders:
     dframe = pd.DataFrame(all_df)
     dframe = dframe.reset_index(drop=True)
     dframe.to_csv(op.join(
-        db_path, folder, results, folder + '_db_GM_masks_atlas.csv'))
+        db_path, folder, results, folder + '_db_GM_masks_3_atlases_trim.csv'))

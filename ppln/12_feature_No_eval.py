@@ -22,11 +22,10 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 logging.basicConfig(level='INFO')
 
 meta_fname = pd.read_csv(op.join(db_path, 'Liege', 'group_results_SUV',
-                         'Liege' + '_db_GM_masks_atlas.csv'))
+                         'Liege' + '_db_GM_masks_3_atlases.csv'))
 #  df = compute_regional_features(db_path, meta_fname)
 
 df = meta_fname.query('QC_PASS == True and ML_VALIDATION == False')
-
 markers = [x for x in df.columns if 'aal' in x]
 X = df[markers].values
 y = (df['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
@@ -75,4 +74,4 @@ fig, ax = plt.subplots(1, 1)
 sns.lineplot(x="feat_num", y='AUC', data=results_df, color='red')
 
 results_df.to_csv(op.join(db_path, 'Liege', 'group_results_SUV',
-                          'Liege' + 'feature_eval_KbestSVC.csv'))
+                          'Liege' + 'feature_eval_KbestSVC_aalspace.csv'))
