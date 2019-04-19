@@ -23,7 +23,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 logging.basicConfig(level='INFO')
 
 meta_fname = pd.read_csv(op.join(db_path, 'Liege', 'group_results_SUV',
-                         'Liege' + '_db_GM_masks_3_atlases.csv'))
+                         'Liege' + '_db_GM_masks_3_atlases_nAAL.csv'))
 #  df = compute_regional_features(db_path, meta_fname)
 
 df = meta_fname.query('QC_PASS == True and ML_VALIDATION == False')
@@ -88,7 +88,7 @@ results['Recall'] = []
 for feat_num in range(1, X.shape[1]):
     print(feat_num)
     sss = StratifiedShuffleSplit(
-        n_splits=100, test_size=0.3, random_state=(feat_num*2 + 124))
+        n_splits=10, test_size=0.3, random_state=(feat_num*2 + 124))
     for t_iter, (train, test) in enumerate(sss.split(X, y)):
         # print(t_iter)
         clf = Pipeline([
