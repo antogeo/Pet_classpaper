@@ -13,11 +13,11 @@ groups = ['Liege']
 
 for group in groups:
     all_df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                         group + '_db_GM_masks_3_atlases.csv'))
+                         group + '_db_GM_masks_3_atlases_nAAL.csv'))
     thresh = all_df[
         all_df['Final diagnosis (behav)'] == 'CTRL']['GMIndex'].mean() + \
         3 * all_df[
             all_df['Final diagnosis (behav)'] == 'CTRL']['GMIndex'].std()
     all_df['QC_PASS'] = all_df['GMIndex'] < thresh
     all_df.to_csv(op.join(db_path, group, 'group_results_SUV',
-                          group + '_db_GM_masks_3_atlases.csv'))
+                          group + '_db_GM_masks_3_atlases_nAAL.csv'))
