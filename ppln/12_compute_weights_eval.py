@@ -18,14 +18,14 @@ from sklearn.feature_selection import f_classif, SelectKBest
 if os.uname()[1] == 'antogeo-XPS':
     db_path = '/home/antogeo/data/PET/pet_suv_db/'
 elif os.uname()[1] == 'comameth':
-    db_path = '/home/coma_meth/Documents/PET/pet_suv_db/'
+    db_path = '/home/coma_meth/dox/pet_suv_db/'
 elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
 
 group = 'Liege'
 
 df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                 group + '_db_GM_masks_3_atlases.csv'))
+                 group + '_db_GM_masks_3_atlases_nAAL.csv'))
 df = df.query('QC_PASS == True and ML_VALIDATION == False')
 
 weight_val = np.arange(1, 10, .2)
@@ -33,7 +33,7 @@ weight_val = sorted(np.concatenate((1 / weight_val, weight_val)))
 
 classifiers = OrderedDict()
 
-markers = [x for x in df.columns if 'cog' in x]
+markers = [x for x in df.columns if 'aal' in x]
 X = df[markers].values
 y = 1 - (df['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
 
@@ -50,15 +50,9 @@ sss = StratifiedShuffleSplit(
 
 for t_iter, (train, test) in enumerate(sss.split(X, y)):
     for val in weight_val:
-        classifiers['SVC_fs15'] = Pipeline([
+        classifiers['SVC_fs20'] = Pipeline([
                 ('scaler', RobustScaler()),
-                ('select', SelectKBest(f_classif, 15)),
-                ('clf', SVC(kernel="linear", C=1,  probability=True,
-                            class_weight={0: 1, 1: val}))
-            ])
-        classifiers['SVC_fs38'] = Pipeline([
-                ('scaler', RobustScaler()),
-                ('select', SelectKBest(f_classif, 38)),
+                ('select', SelectKBest(f_classif, 20)),
                 ('clf', SVC(kernel="linear", C=1,  probability=True,
                             class_weight={0: 1, 1: val}))
             ])
@@ -96,7 +90,7 @@ for t_iter, (train, test) in enumerate(sss.split(X, y)):
 
 df = pd.DataFrame(results)
 
-classif = ['SVC_fs15', 'SVC_fs38']
+classif = ['SVC_fs20', 'SVC_fs38']
 
 fig, ax = plt.subplots(3, 1)
 paper_rc = {'lines.linewidth': .6, 'lines.markersize': 6}
@@ -113,4 +107,4 @@ ax.legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.)
 ax.tick_params(axis='x', direction='out', length=3, width=1, grid_color='r',
                labelrotation=90, grid_alpha=0.5)
 
-df.to_csv('./group_results_SUV/weights_eval_10.csv')
+df.to_csv('./group_results_SUV/weights_eval_nAAL20.csv')

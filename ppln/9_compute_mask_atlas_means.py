@@ -6,7 +6,7 @@ from pypet.features import compute_regional_features
 if os.uname()[1] == 'antogeo-XPS':
     db_path = '/home/antogeo/data/PET/pet_suv_db/'
 elif os.uname()[1] == 'comameth':
-    db_path = '/home/coma_meth/Documents/PET/pet_suv_db/'
+    db_path = '/home/coma_meth/dox/pet_suv_db/'
 elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
 
