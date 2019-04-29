@@ -1,12 +1,8 @@
 # plot scores
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import pypet
-import seaborn as sns
-import matplotlib.gridspec as gridspec
 
-df = pd.read_csv('group_results_SUV/svc10_rf10_boot1000_0328.csv',
+df = pd.read_csv('./group_results_SUV/performance_estimate_1000iter_nAAL.csv',
                  index_col=['Iteration', 'Classifier'])[
                     ['AUC', 'Precision', 'Recall']]
 
@@ -27,7 +23,8 @@ for cl1 in classifiers:
 all_diffs = pd.concat(diffs)
 
 
-all_diffs.to_csv('group_results_SUV/Clfs_contrast_svc10rf10.csv')
+all_diffs.to_csv('group_results_SUV/Clfs_contrast_nAAL.csv')
+
 
 def _compute_p_vals(df, column, ci=.95):
     p_low = ((1.0 - ci) / 2.0) * 100

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 import os.path as op
-from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.utils import resample
 from sklearn.metrics import roc_auc_score, precision_score, recall_score
 from sklearn.svm import SVC
 from sklearn.dummy import DummyClassifier
@@ -24,20 +24,20 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 group = 'Liege'
 
 df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                 group + '_db_GM_masks_atlas.csv'))
-df = df.query('QC_PASS == True and ML_VALIDATION == False')
-
+                 group + '_db_GM_masks_3_atlases_nAAL.csv'))
+df_train = df.query('QC_PASS == True and ML_VALIDATION == False')
+df_val = df.query('QC_PASS == True and ML_VALIDATION == True')
 classifiers = OrderedDict()
 
 classifiers['SVC_rec'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectPercentile(f_classif, 10.)),
+        ('select', SelectPercentile(f_classif, 20.)),
         ('clf', SVC(kernel="linear", C=1, probability=True,
                     class_weight={0: 1, 1: 3.6}))
     ])
 classifiers['SVC_prec'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectPercentile(f_classif, 10.)),
+        ('select', SelectPercentile(f_classif, 20.)),
         ('clf', SVC(kernel="linear", C=1,  probability=True,
                     class_weight={0: 1, 1: .46}))
     ])
@@ -45,55 +45,68 @@ classifiers['RF'] = Pipeline([
     ('scaler', RobustScaler()),
     ('clf', RandomForestClassifier(
         max_depth=10, n_estimators=2000, max_features='auto',
-        class_weight={0: 1, 1: .95}))
+        class_weight={0: 1, 1: 1}))
 ])
 classifiers['Dummy'] = Pipeline([
         ('clf', DummyClassifier(strategy="stratified"))
     ])
 
-markers = [x for x in df.columns if 'aal' in x]
-X = df[markers].values
-y = 1 - (df['Final diagnosis (behav)'] == 'VS').values.astype(np.int)
+markers = [x for x in df_train.columns if 'aal' in x]
+X_train = df_train[markers].values
+y_train = 1 - (df_train[
+    'Final diagnosis (behav)'] == 'VS').values.astype(np.int)
 
-sss = StratifiedShuffleSplit(
-    n_splits=1000, test_size=0.3, random_state=30)
+y_val = 1 - (df_val[
+    'Final diagnosis (behav)'] == 'VS').values.astype(np.int)
+sizes = [np.sum(y_val == 0), np.sum(y_val == 1)]
+
 results = dict()
 results['Iteration'] = []
 results['Recall'] = []
 results['Precision'] = []
 results['AUC'] = []
 results['Classifier'] = []
-feat_sel = []
-feat_rank = []
-for iter, (train_ind, test_ind) in enumerate(sss.split(X, y)):
-    for clf_name, clf in classifiers.items():
-        clf.fit(X[train_ind], y[train_ind])
-        y_pred_class = clf.predict(X[test_ind])
-        y_pred_proba = clf.predict_proba(X[test_ind])[:, 0]
-        auc_score = roc_auc_score(y[test_ind], y_pred_proba)
-        prec_score = precision_score(y[test_ind], y_pred_class)
-        rec_score = recall_score(y[test_ind], y_pred_class)
+t_iter = 1000
+
+for clf_name, clf in classifiers.items():
+    clf.fit(X_train, y_train)
+    for i in range(t_iter):
+        # prepare train and val sets
+        print(i, clf_name)
+        df_test_vs = resample(
+            df_val[y_val == 0], n_samples=sizes[0], random_state=i)
+        df_test_mcs = resample(
+            df_val[y_val == 1], n_samples=sizes[1], random_state=i)
+        df_test = df_test_vs.append(df_test_mcs)
+        X_test = df_test[markers].values
+        y_test = 1 - (df_test[
+            'Final diagnosis (behav)'] == 'VS').values.astype(np.int)
+        y_pred_class = clf.predict(X_test)
+        y_pred_proba = clf.predict_proba(X_test)[:, 1]
+        auc_score = roc_auc_score(y_test, y_pred_proba)
+        prec_score = precision_score(y_test, y_pred_class)
+        rec_score = recall_score(y_test, y_pred_class)
 
         results['Iteration'].append(iter)
         results['Classifier'].append(clf_name)
         results['AUC'].append(auc_score)
         results['Precision'].append(prec_score)
         results['Recall'].append(rec_score)
-        if 'select' in clf.named_steps:
-            print('saving features for {} iter {}'.format(clf_name, iter))
-            feat_sel.append(
-                clf.named_steps['select'].get_support(indices=True))
-            feat_rank.append(dict(zip(markers, -np.log10(
-                clf.named_steps['select'].pvalues_))))
+    # if 'select' in clf.named_steps:
+    #     print('saving features for {} iter {}'.format(clf_name, iter))
+    #     feat_sel.append(
+    #         clf.named_steps['select'].get_support(indices=True))
+    #     feat_rank.append(dict(zip(markers, -np.log10(
+    #         clf.named_steps['select'].pvalues_))))
         # results[clf_name] = cross_validate(
         #   clf, X, y, cv=sss, scoring=scores_f,
         #   return_train_score=True, n_jobs=4)
 
-unique, counts = np.unique(feat_sel, return_counts=True)
-feats = dict(zip(unique, counts))
-df_feats = pd.DataFrame(feats)
-df_feat = pd.DataFrame(feat_rank)
+# unique, counts = np.unique(feat_sel, return_counts=True)
+# feats = dict(zip(unique, counts))
+# df_feats = pd.DataFrame(feats)
+# df_feat = pd.DataFrame(feat_rank)
 df_res = pd.DataFrame(results)
-df_feat.to_csv('./group_results_SUV/feat_rank.csv')
-df_res.to_csv('./group_results_SUV/performance_estimate_1000iter.csv')
-df_feats.to_csv('./group_results_SUV/selected_features.csv')
+# df_feat.to_csv('./group_results_SUV/feat_rank.csv')
+df_res.to_csv('./group_results_SUV/performance_estimate_1000iter_nAAL.csv')
+# df_feats.to_csv('./group_results_SUV/selected_features.csv')
