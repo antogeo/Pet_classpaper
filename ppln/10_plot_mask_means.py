@@ -13,27 +13,27 @@ elif os.uname()[1] == 'comameth':
 elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
 
-groups = ['Liege', 'Paris']
+groups = ['Liege']
 
 for group in groups:
     all_df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                         group + '_db_GM_masks_atlas.csv'))
+                         group + '_db_GM_masks_3_atlases_nAAL.csv'))
     if 'Final diagnosis (behav)' not in all_df:
         all_df['Final diagnosis (behav)'] = 'to test'
 
-    vals = np.unique(all_df['Final diagnosis (behav)'])
+    vals = np.unique(all_df['Label'])
 
     fig_GM, axes_GM = pypet.viz.plot_values(
         all_df,
-        values='GMIndex', target='Final diagnosis (behav)',
+        values='GMIndex', target='Label',
         classes=vals)
 
-    ctrl_mean = all_df[
-        all_df['Final diagnosis (behav)'] == 'CTRL']['GMIndex'].mean()
+    # ctrl_mean = all_df[
+    #     all_df['Label'] == 'CTRL']['GMIndex'].mean()
 
     # Max of selected column and diagnosis
     ctrl_max = all_df[
-        all_df['Final diagnosis (behav)'] == 'CTRL']['GMIndex'].max()
+        all_df['Label'] == 'CTRL']['GMIndex'].max()
 
     axes_GM[0].axhline(ctrl_mean, color='k', ls='--')
 
@@ -42,7 +42,7 @@ for group in groups:
     fig_mean, axes = pypet.viz.plot_values(
         all_df,
         values=['GMIndexLeft', 'GMIndexRight'],
-        target='Final diagnosis (behav)',
+        target='Label',
         classes=vals)
 
     # Plot the four sides
@@ -50,6 +50,6 @@ for group in groups:
         all_df,
         values=['GMIndexPreLeft', 'GMIndexPreLeft',
                 'GMIndexPostLeft', 'GMIndexPostRight'],
-        target='Final diagnosis (behav)',
+        target='Label',
         classes=vals,
         n_cols=2)
