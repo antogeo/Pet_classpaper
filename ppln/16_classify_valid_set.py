@@ -3,11 +3,10 @@ import pandas as pd
 import os
 import os.path as op
 from sklearn.svm import SVC
-from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
-from sklearn.feature_selection import f_classif, SelectPercentile
+from sklearn.feature_selection import f_classif, SelectKBest
 from collections import OrderedDict
 
 
@@ -29,13 +28,13 @@ classifiers = OrderedDict()
 
 classifiers['SVC_rec'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectPercentile(f_classif, 20.)),
+        ('select', SelectKBest(f_classif, 10)),
         ('clf', SVC(kernel="linear", C=1, probability=True,
                     class_weight={0: 1, 1: 3.6}))
     ])
 classifiers['SVC_prec'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectPercentile(f_classif, 20.)),
+        ('select', SelectKBest(f_classif, 10)),
         ('clf', SVC(kernel="linear", C=1,  probability=True,
                     class_weight={0: 1, 1: .46}))
     ])
@@ -76,9 +75,9 @@ for clf_name, clf in classifiers.items():
         results['Label'].append(1 - (df_test.iloc[i][
             'Final diagnosis (behav)'] == 'VS'))
 
-df_res[df_res['Classifier'] =='RF'] = pd.DataFrame(results)
+df_res = pd.DataFrame(results)
 df = df_res.pivot(columns='Classifier', index='Subject', values=[
     'Score', 'Proba'])
 df['Label'] = results['Label'][0:53]
 df.to_csv(op.join(db_path, group, 'group_results_SUV',
-                  group + 'validation_set_results.csv'))
+                  group + 'validation_set_10best_results.csv'))

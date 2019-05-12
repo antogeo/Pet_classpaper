@@ -4,7 +4,7 @@ import seaborn as sns
 
 
 df = pd.read_csv(
-    '/home/antogeo/codes/PET_class/result_dfs/feature_eval_SVC.csv')
+    '/home/antogeo/codes/PET_class/result_dfs/feature_eval_KbestSVC_naalspace.csv')
 
 sns.set_style("darkgrid", {"axes.facecolor": ".9"})
 sns.set_context("notebook", font_scale=1.5, rc={"lines.linewidth": 1})

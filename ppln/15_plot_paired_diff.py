@@ -4,13 +4,13 @@ import pypet
 import seaborn as sns
 import matplotlib.gridspec as gridspec
 
-df = pd.read_csv('group_results_SUV/performance_estimate_1000iter_nAAL.csv',
+df = pd.read_csv('group_results_SUV/perf_estim_47Best_1000iter_nAAL_max.csv',
                  index_col=['Iteration', 'Classifier'])[
                     ['AUC', 'Precision', 'Recall']]
 
 df = df.reset_index()
 
-contr_df = pd.read_csv('group_results_SUV/Clfs_contrast_nAAL.csv')
+contr_df = pd.read_csv('group_results_SUV/Clfs_contrast_allfeat_nAALmax.csv')
 diff_df = contr_df.loc[contr_df['Contrast'].str.contains("-Dummy")]
 
 rf_auc = df[df['Classifier'] == 'RF']['AUC'].mean()
@@ -60,7 +60,7 @@ print('{0} times that RF-Dummy AUC was below 0 '.format(
         'AUC'] < 0) * 1)))
 
 ax2.axvline(0, linestyle='--', color='red', alpha=0.4)
-
+# ==================================================================
 plt.figure(2)
 gs2 = gridspec.GridSpec(2, 1, height_ratios=[4, 1])
 
@@ -90,7 +90,7 @@ print('{0} times that SVC_prec-Dummy Recall was below 0'.format(
 print('{0} times that RF-Dummy Recall was below 0 '.format(
     sum((diff_df[diff_df['Contrast'] == 'RF-Dummy'][
         'Recall'] < 0) * 1)))
-
+# ===================================================================
 plt.figure(3)
 gs3 = gridspec.GridSpec(2, 1, height_ratios=[4, 1])
 
@@ -110,12 +110,6 @@ ax32 = plt.subplot(gs3[1])
 sns.boxplot(data=diff_df, x='Precision', y='Contrast', ax=ax32)
 ax32.axvline(0, linestyle='--', color='red', alpha=0.4)
 
-xposlist = df.groupby(['Classifier']).mean()
-xposlist = range(len(yposlist))
-stringlist = [rf_prec, svc_prec_prec, svc_rec_prec, Dum_prec]
-for i in range(len(stringlist)):
-    ax31.text(xposlist[i] + 0.05,
-              stringlist[i], format(round(stringlist[i], 2)))
 print('{0} times that SVC_rec-Dummy Precision was below 0'.format(
     sum((diff_df[diff_df['Contrast'] == 'SVC_rec-Dummy'][
         'Precision'] < 0) * 1)))

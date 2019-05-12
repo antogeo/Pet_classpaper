@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 
-df = pd.read_csv('./group_results_SUV/performance_estimate_1000iter_nAAL.csv',
+df = pd.read_csv('./group_results_SUV/perf_estim_47Best_1000iter_nAAL_max.csv',
                  index_col=['Iteration', 'Classifier'])[
                     ['AUC', 'Precision', 'Recall']]
 
@@ -23,7 +23,7 @@ for cl1 in classifiers:
 all_diffs = pd.concat(diffs)
 
 
-all_diffs.to_csv('group_results_SUV/Clfs_contrast_nAAL.csv')
+all_diffs.to_csv('group_results_SUV/Clfs_contrast_allfeat_nAALmax.csv')
 
 
 def _compute_p_vals(df, column, ci=.95):
