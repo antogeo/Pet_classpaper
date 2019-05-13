@@ -14,10 +14,12 @@ groups = ['Liege']
 for group in groups:
     all_df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
                          group + '_db_GM_AAL_nocereb.csv'))
-    thresh = all_df[
-        all_df['Final diagnosis (behav)'] == 'CTRL']['GMIndex'].mean() + \
-        3 * all_df[
-            all_df['Final diagnosis (behav)'] == 'CTRL']['GMIndex'].std()
+    ctrl_df = pd.read_csv(op.join(db_path, 'Liege', 'group_results_SUV',
+                         'Liege' + '_db_GM_AAL_nocereb.csv'))
+    thresh = ctrl_df[
+        ctrl_df['Final diagnosis (behav)'] == 'CTRL']['GMIndex'].mean() + \
+        3 * ctrl_df[
+            ctrl_df['Final diagnosis (behav)'] == 'CTRL']['GMIndex'].std()
     all_df['QC_PASS'] = all_df['GMIndex'] < thresh
     all_df.to_csv(op.join(db_path, group, 'group_results_SUV',
                           group + '_db_GM_AAL_nocereb.csv'))

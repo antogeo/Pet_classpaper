@@ -2,7 +2,17 @@
 import pandas as pd
 import numpy as np
 
-df = pd.read_csv('./group_results_SUV/perf_estim_47Best_1000iter_nAAL_max.csv',
+if os.uname()[1] == 'antogeo-XPS':
+    db_path = '/home/antogeo/data/PET/pet_suv_db/'
+elif os.uname()[1] == 'comameth':
+    db_path = '/home/coma_meth/dox/pet_suv_db/'
+elif os.uname()[1] in ['mia.local', 'mia']:
+    db_path = '/Users/fraimondo/data/pet_suv_db/'
+
+group = 'Liege'
+
+df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
+        ...:     'val_perf_estim_bs_f20_AAL90.csv'),
                  index_col=['Iteration', 'Classifier'])[
                     ['AUC', 'Precision', 'Recall']]
 
@@ -23,7 +33,8 @@ for cl1 in classifiers:
 all_diffs = pd.concat(diffs)
 
 
-all_diffs.to_csv('group_results_SUV/Clfs_contrast_allfeat_nAALmax.csv')
+all_diffs.to_csv(op.join(db_path, group, 'group_results_SUV',
+                 'Clfs_contrast_f20_AAL90.csv'))
 
 
 def _compute_p_vals(df, column, ci=.95):

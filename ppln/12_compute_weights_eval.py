@@ -25,7 +25,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 group = 'Liege'
 
 df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                 group + '_db_GM_masks_3_atlases_nAAL.csv'))
+                 group + '_db_GM_AAL_nocereb.csv'))
 df = df.query('QC_PASS == True and ML_VALIDATION == False')
 
 weight_val = np.arange(1, 10, .2)
@@ -53,6 +53,12 @@ for t_iter, (train, test) in enumerate(sss.split(X, y)):
         classifiers['SVC_fs20'] = Pipeline([
                 ('scaler', RobustScaler()),
                 ('select', SelectKBest(f_classif, 20)),
+                ('clf', SVC(kernel="linear", C=1,  probability=True,
+                            class_weight={0: 1, 1: val}))
+            ])
+        classifiers['SVC_fs10'] = Pipeline([
+                ('scaler', RobustScaler()),
+                ('select', SelectKBest(f_classif, 10)),
                 ('clf', SVC(kernel="linear", C=1,  probability=True,
                             class_weight={0: 1, 1: val}))
             ])
@@ -90,21 +96,21 @@ for t_iter, (train, test) in enumerate(sss.split(X, y)):
 
 df = pd.DataFrame(results)
 
-classif = ['SVC_fs20', 'SVC_fs38']
+# classif = ['SVC_fs20', 'SVC_fs38']
+#
+# fig, ax = plt.subplots(3, 1)
+# paper_rc = {'lines.linewidth': .6, 'lines.markersize': 6}
+# sns.set_context("paper", rc=paper_rc)
+# df['Weight Val'] = df['Weight Val'].round(4)
+# ax[0] = sns.pointplot(x="Weight Val", y="Recall", hue="Classifier",
+#                       data=df, ax=ax, hue_order=classif)
+# ax[1] = sns.pointplot(x="Weight Val", y="Precision", hue="Classifier",
+#                       data=df, ax=ax, hue_order=classif)
+# ax[2] = sns.pointplot(x="Weight Val", y="AUC", hue="Classifier",
+#                       data=df, ax=ax, hue_order=classif)
+#
+# ax.legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.)
+# ax.tick_params(axis='x', direction='out', length=3, width=1, grid_color='r',
+#                labelrotation=90, grid_alpha=0.5)
 
-fig, ax = plt.subplots(3, 1)
-paper_rc = {'lines.linewidth': .6, 'lines.markersize': 6}
-sns.set_context("paper", rc=paper_rc)
-df['Weight Val'] = df['Weight Val'].round(4)
-ax[0] = sns.pointplot(x="Weight Val", y="Recall", hue="Classifier",
-                      data=df, ax=ax, hue_order=classif)
-ax[1] = sns.pointplot(x="Weight Val", y="Precision", hue="Classifier",
-                      data=df, ax=ax, hue_order=classif)
-ax[2] = sns.pointplot(x="Weight Val", y="AUC", hue="Classifier",
-                      data=df, ax=ax, hue_order=classif)
-
-ax.legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.)
-ax.tick_params(axis='x', direction='out', length=3, width=1, grid_color='r',
-               labelrotation=90, grid_alpha=0.5)
-
-df.to_csv('./group_results_SUV/weights_eval_nAAL20.csv')
+df.to_csv('./group_results_SUV/weights_eval_AAL_nocereb.csv')

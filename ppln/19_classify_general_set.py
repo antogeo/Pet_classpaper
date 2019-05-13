@@ -18,12 +18,14 @@ elif os.uname()[1] == 'comameth':
 elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
 
-group = 'Liege'
+group = 'Paris'
 
-df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
+df = pd.read_csv(op.join(db_path, 'Liege', 'group_results_SUV',
+                 'Liege' + '_db_GM_AAL_nocereb.csv'))
+gen_df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
                  group + '_db_GM_AAL_nocereb.csv'))
 df_train = df.query('QC_PASS == True and ML_VALIDATION == False')
-df_test = df.query('QC_PASS == True and ML_VALIDATION == True')
+df_test = gen_df.query('QC_PASS == True and ML_gener == True')
 classifiers = OrderedDict()
 
 classifiers['SVC_rec'] = Pipeline([
@@ -77,6 +79,5 @@ for clf_name, clf in classifiers.items():
 
 df_res = pd.DataFrame(results)
 df = df_res.pivot(columns='Classifier', index='Subject')
-df['Label'] = results['Label'][0:53]
 df.to_csv(op.join(db_path, group, 'group_results_SUV',
-                  group + 'validation_set_10best_results.csv'))
+                  group + 'gener_res_f10_AAL90.csv'))

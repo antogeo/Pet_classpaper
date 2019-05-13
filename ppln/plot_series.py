@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
-df = pd.read_csv('./group_results_SUV/weights_eval_nAAL20.csv')
+df = pd.read_csv('./group_results_SUV/weights_eval_AAL_nocereb.csv')
 
 res = dict()
 res['weights'] = []

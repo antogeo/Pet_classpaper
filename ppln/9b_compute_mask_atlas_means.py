@@ -11,7 +11,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
 
 results = 'group_results_SUV'
-folders = ['Liege', 'Paris']
+folders = ['Paris']
 all_df = []
 for folder in folders:
     meta_fname = op.join(db_path, folder, 'extra', folder + '_meta.csv')

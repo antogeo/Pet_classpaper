@@ -21,30 +21,32 @@ elif os.uname()[1] == 'comameth':
 elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
 
-group = 'Liege'
+group = 'Paris'
 
-df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
+df = pd.read_csv(op.join(db_path, 'Liege', 'group_results_SUV',
+                 'Liege' + '_db_GM_AAL_nocereb.csv'))
+gen_df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
                  group + '_db_GM_AAL_nocereb.csv'))
 df_train = df.query('QC_PASS == True and ML_VALIDATION == False')
-df_val = df.query('QC_PASS == True and ML_VALIDATION == True')
+df_gen = gen_df.query('QC_PASS == True and ML_gener == True')
 classifiers = OrderedDict()
 
 classifiers['SVC_rec'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectPercentile(f_classif, 10.)),
+        ('select', SelectPercentile(f_classif, 20.)),
         ('clf', SVC(kernel="linear", C=1, probability=True,
-                    class_weight={0: 1, 1: 2.4}))
+                    class_weight={0: 1, 1: 2.8}))
     ])
 classifiers['SVC_prec'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectPercentile(f_classif, 10.)),
+        ('select', SelectPercentile(f_classif, 20.)),
         ('clf', SVC(kernel="linear", C=1,  probability=True,
                     class_weight={0: 1, 1: .55}))
     ])
 classifiers['RF'] = Pipeline([
     ('scaler', RobustScaler()),
     ('clf', RandomForestClassifier(
-        max_depth=5, n_estimators=2000, max_features='auto',
+        max_depth=10, n_estimators=2000, max_features='auto',
         class_weight={0: 1, 1: 1}))
 ])
 classifiers['Dummy'] = Pipeline([
@@ -56,8 +58,8 @@ X_train = df_train[markers].values
 y_train = 1 - (df_train[
     'Final diagnosis (behav)'] == 'VS').values.astype(np.int)
 
-y_val = 1 - (df_val[
-    'Final diagnosis (behav)'] == 'VS').values.astype(np.int)
+y_val = 1 - (df_gen[
+    'Label'] == 'VS').values.astype(np.int)
 sizes = [np.sum(y_val == 0), np.sum(y_val == 1)]
 
 results = dict()
@@ -74,9 +76,9 @@ for clf_name, clf in classifiers.items():
         # prepare train and val sets
         print(i, clf_name)
         df_test_vs = resample(
-            df_val[y_val == 0], n_samples=sizes[0], random_state=i)
+            df_gen[y_val == 0], n_samples=sizes[0], random_state=i)
         df_test_mcs = resample(
-            df_val[y_val == 1], n_samples=sizes[1], random_state=i)
+            df_gen[y_val == 1], n_samples=sizes[1], random_state=i)
         df_test = df_test_vs.append(df_test_mcs)
         X_test = df_test[markers].values
         y_test = 1 - (df_test[
@@ -109,5 +111,5 @@ for clf_name, clf in classifiers.items():
 df_res = pd.DataFrame(results)
 # df_feat.to_csv('./group_results_SUV/feat_rank.csv')
 df_res.to_csv(op.join(db_path, group, 'group_results_SUV',
-              'group/perf_estim_1000iter_f10_AAL90.csv'))
+    'gen_perf_estim_bs_f20_AAL90.csv'))
 # df_feats.to_csv('./group_results_SUV/selected_features.csv')
