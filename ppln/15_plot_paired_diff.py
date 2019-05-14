@@ -4,13 +4,13 @@ import pypet
 import seaborn as sns
 import matplotlib.gridspec as gridspec
 
-df = pd.read_csv('group_results_SUV/perf_estim_47Best_1000iter_nAAL_max.csv',
+df = pd.read_csv('group_results_SUV/perf_estim_1000iter_f10_AAL90.csv',
                  index_col=['Iteration', 'Classifier'])[
                     ['AUC', 'Precision', 'Recall']]
 
 df = df.reset_index()
 
-contr_df = pd.read_csv('group_results_SUV/Clfs_contrast_allfeat_nAALmax.csv')
+contr_df = pd.read_csv('group_results_SUV/Clfs_contrast_f10_AAL90.csv')
 diff_df = contr_df.loc[contr_df['Contrast'].str.contains("-Dummy")]
 
 rf_auc = df[df['Classifier'] == 'RF']['AUC'].mean()

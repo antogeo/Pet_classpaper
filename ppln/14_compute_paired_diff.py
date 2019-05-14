@@ -12,7 +12,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 group = 'Liege'
 
 df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-        ...:     'val_perf_estim_bs_f20_AAL90.csv'),
+                'perf_estim_1000iter_f10_AAL90.csv'),
                  index_col=['Iteration', 'Classifier'])[
                     ['AUC', 'Precision', 'Recall']]
 
@@ -34,7 +34,7 @@ all_diffs = pd.concat(diffs)
 
 
 all_diffs.to_csv(op.join(db_path, group, 'group_results_SUV',
-                 'Clfs_contrast_f20_AAL90.csv'))
+                 'Clfs_contrast_f10_AAL90.csv'))
 
 
 def _compute_p_vals(df, column, ci=.95):

@@ -39,7 +39,7 @@ classifiers['SVC_prec'] = Pipeline([
         ('scaler', RobustScaler()),
         ('select', SelectPercentile(f_classif, 10.)),
         ('clf', SVC(kernel="linear", C=1,  probability=True,
-                    class_weight={0: 1, 1: .55}))
+                    class_weight={0: 1, 1: .6}))
     ])
 classifiers['RF'] = Pipeline([
     ('scaler', RobustScaler()),
@@ -109,5 +109,5 @@ for clf_name, clf in classifiers.items():
 df_res = pd.DataFrame(results)
 # df_feat.to_csv('./group_results_SUV/feat_rank.csv')
 df_res.to_csv(op.join(db_path, group, 'group_results_SUV',
-              'group/perf_estim_1000iter_f10_AAL90.csv'))
+              'perf_estim_1000iter_f10_AAL90.csv'))
 # df_feats.to_csv('./group_results_SUV/selected_features.csv')
