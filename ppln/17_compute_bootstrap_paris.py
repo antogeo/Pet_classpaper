@@ -33,20 +33,20 @@ classifiers = OrderedDict()
 
 classifiers['SVC_rec'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectPercentile(f_classif, 20.)),
+        ('select', SelectPercentile(f_classif, 10.)),
         ('clf', SVC(kernel="linear", C=1, probability=True,
-                    class_weight={0: 1, 1: 2.8}))
+                    class_weight={0: 1, 1: 2.4}))
     ])
 classifiers['SVC_prec'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectPercentile(f_classif, 20.)),
+        ('select', SelectPercentile(f_classif, 10.)),
         ('clf', SVC(kernel="linear", C=1,  probability=True,
                     class_weight={0: 1, 1: .55}))
     ])
 classifiers['RF'] = Pipeline([
     ('scaler', RobustScaler()),
     ('clf', RandomForestClassifier(
-        max_depth=10, n_estimators=2000, max_features='auto',
+        max_depth=5, n_estimators=2000, max_features='auto',
         class_weight={0: 1, 1: 1}))
 ])
 classifiers['Dummy'] = Pipeline([
@@ -111,5 +111,5 @@ for clf_name, clf in classifiers.items():
 df_res = pd.DataFrame(results)
 # df_feat.to_csv('./group_results_SUV/feat_rank.csv')
 df_res.to_csv(op.join(db_path, group, 'group_results_SUV',
-    'gen_perf_estim_bs_f20_AAL90.csv'))
+    'gen_perf_estim_bs_f10_AAL90.csv'))
 # df_feats.to_csv('./group_results_SUV/selected_features.csv')

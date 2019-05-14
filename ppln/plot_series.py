@@ -5,16 +5,16 @@ import matplotlib.ticker as ticker
 import numpy as np
 
 df = pd.read_csv('./group_results_SUV/weights_eval_AAL_nocereb.csv')
-
+df = df[df['Classifier']!='SVC_fs20']
 res = dict()
 res['weights'] = []
 res['mean rec'] = []
 res['mean pre'] = []
 for weight in np.unique(df['Weight Val']):
     res['weights'].append(weight)
-    res['mean rec'].append(np.mean(df.loc[(df['Classifier'] == 'SVC_fs20') & (
+    res['mean rec'].append(np.mean(df.loc[(df['Classifier'] == 'SVC_fs10') & (
         df['Weight Val'] == weight)]['Recall']))
-    res['mean pre'].append(np.mean(df.loc[(df['Classifier'] == 'SVC_fs20') & (
+    res['mean pre'].append(np.mean(df.loc[(df['Classifier'] == 'SVC_fs10') & (
         df['Weight Val'] == weight)]['Precision']))
 results = pd.DataFrame(res)
 
@@ -40,7 +40,7 @@ for i in axes:
     i.set_xlabel('MCS/UWS (Weights Ratio)')
     i.set_xlim(0, 10)
     i.xaxis.set_major_locator(ticker.MultipleLocator(.2))
-    i.legend(('SVC', 'Random Forest', 'Dummy'), title="Classifier")
+    # i.legend(('SVC', 'Random Forest', 'Dummy'), title="Classifier")
 
 # plt.savefig('./group_results_SUV/weights_nAAL_compar_box.pdf')
 plt.show()

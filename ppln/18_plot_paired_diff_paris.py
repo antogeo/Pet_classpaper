@@ -15,14 +15,14 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 group = 'Paris'
 
 df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                  'gen_perf_estim_bs_f20_AAL90.csv'),
+                  'gen_perf_estim_bs_f10_AAL90.csv'),
                   index_col=['Iteration', 'Classifier'])[
                     ['AUC', 'Precision', 'Recall']]
 
 df = df.reset_index()
 
 contr_df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                       'Clfs_contrast_paris_f20_AAL90.csv'))
+                       'Clfs_contrast_f10_AAL90.csv'))
 diff_df = contr_df.loc[contr_df['Contrast'].str.contains("-Dummy")]
 
 rf_auc = df[df['Classifier'] == 'RF']['AUC'].mean()

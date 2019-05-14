@@ -15,14 +15,14 @@ import matplotlib.pyplot as plt
 if os.uname()[1] == 'antogeo-XPS':
     db_path = '/home/antogeo/data/PET/pet_suv_db/'
 elif os.uname()[1] == 'comameth':
-    db_path = '/home/coma_meth/Documents/PET/pet_suv_db/'
+    db_path = '/home/coma_meth/dox/pet_suv_db/'
 elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
 
 logging.basicConfig(level='INFO')
 
 meta_fname = pd.read_csv(op.join(db_path, 'Liege', 'group_results_SUV',
-                         'Liege' + '_db_GM_masks_3_atlases_nAAL.csv'))
+                         'Liege' + '_db_GM_AAL_nocereb.csv'))
 #  df = compute_regional_features(db_path, meta_fname)
 
 df = meta_fname.query('QC_PASS == True and ML_VALIDATION == False')
@@ -69,9 +69,15 @@ results_df = pd.DataFrame(results)
 
 # metrics = ['AUC', 'Precision', 'Recall']
 # colors = ['red', 'green', 'blue']
-fig, ax = plt.subplots(1, 1)
 
-sns.lineplot(x="feat_num", y='AUC', data=results_df, color='red')
+fig, axes = plt.subplots(3, 1, figsize=(12, 6))
+sns.lineplot(x="feat_num", y='AUC',
+             data=results_df, color='red', ax=axes[0])
+sns.lineplot(x="feat_num", y='Precision',
+             data=results_df, color='red', ax=axes[1])
+sns.lineplot(x="feat_num", y='Recall',
+             data=results_df, color='red',  ax=axes[2])
+
 
 results_df.to_csv(op.join(db_path, 'Liege', 'group_results_SUV',
-                          'Liege' + 'feature_eval_KbestSVC_naalspace.csv'))
+                          'Liege' + 'feature_eval_nocereb.csv'))
