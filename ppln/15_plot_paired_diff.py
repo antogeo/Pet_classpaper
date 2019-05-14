@@ -42,8 +42,8 @@ yposlist = df.groupby(['Classifier']).mean()
 xposlist = range(len(yposlist))
 stringlist = [rf_auc, svc_prec_auc, svc_rec_auc, Dum_auc]
 for i in range(len(stringlist)):
-    ax1.text(xposlist[i] + 0.05,
-             stringlist[i], format(round(stringlist[i], 2)))
+    ax1.text(xposlist[i] + .1,
+             stringlist[i] + .1, format(round(stringlist[i], 2)))
 
 
 ax2 = plt.subplot(gs[1])
@@ -75,8 +75,8 @@ yposlist = df.groupby(['Classifier']).mean()
 xposlist = range(len(yposlist))
 stringlist = [rf_rec, svc_prec_rec, svc_rec_rec, Dum_rec]
 for i in range(len(stringlist)):
-    ax21.text(xposlist[i] + 0.05,
-              stringlist[i], format(round(stringlist[i], 2)))
+    ax21.text(xposlist[i] + .1,
+              stringlist[i]+ .1, format(round(stringlist[i], 2)))
 
 ax22 = plt.subplot(gs2[1])
 sns.boxplot(data=diff_df, x='Recall', y='Contrast', ax=ax22)
@@ -104,8 +104,8 @@ yposlist = df.groupby(['Classifier']).mean()
 xposlist = range(len(yposlist))
 stringlist = [rf_prec, svc_prec_prec, svc_rec_prec, Dum_prec]
 for i in range(len(stringlist)):
-    ax31.text(xposlist[i] + 0.05,
-              stringlist[i], format(round(stringlist[i], 2)))
+    ax31.text(xposlist[i] + .1,
+              stringlist[i]+ .1, format(round(stringlist[i], 2)))
 ax32 = plt.subplot(gs3[1])
 sns.boxplot(data=diff_df, x='Precision', y='Contrast', ax=ax32)
 ax32.axvline(0, linestyle='--', color='red', alpha=0.4)
