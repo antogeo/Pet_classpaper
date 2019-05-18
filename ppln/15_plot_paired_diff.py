@@ -45,7 +45,7 @@ for i in range(len(stringlist)):
     ax1.text(xposlist[i] + .1,
              stringlist[i] + .1, format(round(stringlist[i], 2)))
 
-
+ax1.axhline(.5, linestyle='--', color='red', alpha=0.4)
 ax2 = plt.subplot(gs[1])
 
 sns.boxplot(data=diff_df, x='AUC', y='Contrast', ax=ax2)
@@ -77,7 +77,7 @@ stringlist = [rf_rec, svc_prec_rec, svc_rec_rec, Dum_rec]
 for i in range(len(stringlist)):
     ax21.text(xposlist[i] + .1,
               stringlist[i]+ .1, format(round(stringlist[i], 2)))
-
+ax21.axhline(0.5, linestyle='--', color='red', alpha=0.4)
 ax22 = plt.subplot(gs2[1])
 sns.boxplot(data=diff_df, x='Recall', y='Contrast', ax=ax22)
 ax22.axvline(0, linestyle='--', color='red', alpha=0.4)
@@ -95,7 +95,7 @@ plt.figure(3)
 gs3 = gridspec.GridSpec(2, 1, height_ratios=[4, 1])
 
 ax31 = plt.subplot(gs3[0])
-
+ax31.axhline(0.5, linestyle='--', color='red', alpha=0.4)
 pypet.viz.plot_values(df, values='Precision',
                       target='Classifier', axes=ax31,
                       classes=['RF', 'SVC_prec', 'SVC_rec', 'Dummy'],
