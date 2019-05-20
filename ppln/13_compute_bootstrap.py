@@ -24,7 +24,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 group = 'Liege'
 
 df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                 group + '_db_GM_AAL_nocereb.csv'))
+                 group + '_db_GM_AAL.csv'))
 df_train = df.query('QC_PASS == True and ML_VALIDATION == False')
 df_val = df.query('QC_PASS == True and ML_VALIDATION == True')
 classifiers = OrderedDict()
@@ -87,7 +87,7 @@ for clf_name, clf in classifiers.items():
         prec_score = precision_score(y_test, y_pred_class)
         rec_score = recall_score(y_test, y_pred_class)
 
-        results['Iteration'].append(iter)
+        results['Iteration'].append(i)
         results['Classifier'].append(clf_name)
         results['AUC'].append(auc_score)
         results['Precision'].append(prec_score)
@@ -109,5 +109,5 @@ for clf_name, clf in classifiers.items():
 df_res = pd.DataFrame(results)
 # df_feat.to_csv('./group_results_SUV/feat_rank.csv')
 df_res.to_csv(op.join(db_path, group, 'group_results_SUV',
-              'perf_estim_1000iter_f10_AAL90.csv'))
+              'perf_estim_1000iter_f10_AAL90_ctrlout.csv'))
 # df_feats.to_csv('./group_results_SUV/selected_features.csv')

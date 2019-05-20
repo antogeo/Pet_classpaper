@@ -21,7 +21,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 group = 'Liege'
 
 df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                 group + '_db_GM_AAL_nocereb.csv'))
+                 group + '_db_GM_AAL.csv'))
 df_train = df.query('QC_PASS == True and ML_VALIDATION == False')
 df_test = df.query('QC_PASS == True and ML_VALIDATION == True')
 classifiers = OrderedDict()
@@ -79,4 +79,4 @@ df_res = pd.DataFrame(results)
 df = df_res.pivot(columns='Classifier', index='Subject')
 df['Label'] = results['Label'][0:53]
 df.to_csv(op.join(db_path, group, 'group_results_SUV',
-                  group + 'validation_set_10best_results.csv'))
+                  group + 'validation_set_10best_results_ctrlout.csv'))

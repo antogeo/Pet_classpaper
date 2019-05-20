@@ -11,7 +11,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
 
 results = 'group_results_SUV'
-folders = ['Liege', 'Paris']
+folders = ['Liege']
 all_df = []
 for folder in folders:
     meta_fname = op.join(db_path, folder, 'extra', folder + '_meta.csv')
@@ -21,4 +21,4 @@ for folder in folders:
     dframe = pd.DataFrame(all_df)
     dframe = dframe.reset_index(drop=True)
     dframe.to_csv(op.join(
-        db_path, folder, results, folder + '_db_GM_AAL_nocereb.csv'))
+        db_path, folder, results, folder + '_db_GM_AAL.csv'))

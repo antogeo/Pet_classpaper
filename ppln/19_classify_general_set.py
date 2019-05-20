@@ -21,7 +21,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 group = 'Paris'
 
 df = pd.read_csv(op.join(db_path, 'Liege', 'group_results_SUV',
-                 'Liege' + '_db_GM_AAL_nocereb.csv'))
+                 'Liege' + '_db_GM_AAL.csv'))
 gen_df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
                  group + '_db_GM_AAL_nocereb.csv'))
 df_train = df.query('QC_PASS == True and ML_VALIDATION == False')
@@ -80,4 +80,4 @@ for clf_name, clf in classifiers.items():
 df_res = pd.DataFrame(results)
 df = df_res.pivot(columns='Classifier', index='Subject')
 df.to_csv(op.join(db_path, group, 'group_results_SUV',
-                  group + 'gener_res_f10_AAL90.csv'))
+                  group + 'gener_res_f10_AAL90_noctrl.csv'))

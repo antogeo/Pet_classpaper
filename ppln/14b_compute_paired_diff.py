@@ -1,6 +1,9 @@
 # plot scores
 import pandas as pd
 import numpy as np
+import os
+import os.path as op
+
 
 if os.uname()[1] == 'antogeo-XPS':
     db_path = '/home/antogeo/data/PET/pet_suv_db/'
@@ -12,7 +15,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 group = 'Paris'
 
 df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                 'gen_perf_estim_bs_f10_AAL90.csv'),
+                 'gen_perf_estim_bs_f10_AAL90_noctrl.csv'),
                  index_col=['Iteration', 'Classifier'])[
                     ['AUC', 'Precision', 'Recall']]
 
@@ -34,7 +37,7 @@ all_diffs = pd.concat(diffs)
 
 
 all_diffs.to_csv(op.join(db_path, group, 'group_results_SUV',
-                 'Clfs_contrast_f10_AAL90.csv'))
+                 'Clfs_contrast_f10_AAL90_noctrl.csv'))
 
 
 def _compute_p_vals(df, column, ci=.95):

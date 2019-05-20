@@ -13,6 +13,14 @@ import nibabel as nib
 import nilearn.plotting as plotting
 import seaborn as sns
 import matplotlib.pyplot as plt
+import re
+
+
+def sorted_nicely( l ):
+    """ Sort the given iterable in the way that humans expect."""
+    convert = lambda text: int(text) if text.isdigit() else text
+    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+    return sorted(l, key = alphanum_key)
 
 
 # load dataset
@@ -51,6 +59,8 @@ classifiers['XRF'] = Pipeline([
 ])
 
 markers = [x for x in df_train.columns if 'aal' in x]
+markers = sorted_nicely(markers)
+
 X_train = df_train[markers].values
 y_train = 1 - (df_train[
     'Final diagnosis (behav)'] == 'VS').values.astype(np.int)
