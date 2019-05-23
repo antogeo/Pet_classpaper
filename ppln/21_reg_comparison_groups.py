@@ -32,9 +32,9 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 group = 'Paris'
 
 df = pd.read_csv(op.join(db_path, 'Liege', 'group_results_SUV',
-                 'Liege' + '_db_GM_AAL.csv'))
+                 'Liege' + '_extrcran.csv'))
 gen_df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                 group + '_db_GM_AAL_nocereb.csv'))
+                 group + '_extrcran.csv'))
 df_train = df.query('QC_PASS == True and ML_VALIDATION == False')
 df_gen = gen_df.query('QC_PASS == True and ML_gener == True')
 
@@ -59,6 +59,7 @@ for i in range(10):
     feat_sel[name] = select.transform(X_train)[:, i]
 feat_sel['label'] = y_train
 feat_sel['site'] = ['Liege'] * len(y_train)
+feat_sel['extracr'] =  df_train['extcr_sphere_1']
 
 for i in range(10):
     name = 'reg_' + str(i)
@@ -66,6 +67,8 @@ for i in range(10):
             (feat_sel[name], select.transform(X_test)[:, i]))
 feat_sel['label'] = np.concatenate((feat_sel['label'], y_test))
 feat_sel['site'] = np.concatenate((feat_sel['site'], ['Paris'] * len(y_test)))
+feat_sel['extracr'] =  np.concatenate((feat_sel['extracr'],
+                                       df_gen['extcr_sphere_1']))
 
 df = pd.DataFrame(feat_sel)
 df['label'] = df['label'].replace(0, 'UWS')
@@ -76,30 +79,6 @@ selected_liege_feat = select.transform(X_train)
 selected_paris_feat = select.transform(X_test)
 rois = roi_names[:95]
 selected_regions = rois[select.get_support()]
-for reg in range(10):
-    fig, axes = plt.subplots(2, 1, figsize=(10, 6))
-    liege_mcs = selected_liege_feat[numpy.where(y_train == 1)[0]]
-    liege_uws = selected_liege_feat[numpy.where(y_train == 0)[0]]
-    paris_mcs = selected_paris_feat[numpy.where(y_test == 1)[0]]
-    paris_uws = selected_paris_feat[numpy.where(y_test == 0)[0]]
-    sns.distplot(bins=100, a=liege_mcs[:, reg], ax=axes[0], label='Liege MCS',
-                 rug=True, hist=False, color = 'b')
-    sns.distplot(bins=100, a=liege_uws[:, reg], ax=axes[0], label='Liege UWS',
-                 rug=True, hist=False, color = 'r')
-    axes[0].axvline(liege_mcs[:, reg].mean(), color='b')
-    axes[0].axvline(liege_uws[:, reg].mean(), color='r')
-
-    sns.distplot(bins=100, a=paris_mcs[:, reg], ax=axes[1], label='Paris MCS',
-                 rug=True, hist=False, color = 'g')
-    sns.distplot(bins=100, a=paris_uws[:, reg], ax=axes[1], label='Paris UWS',
-                 rug=True, hist=False, color = 'y')
-    axes[1].axvline(paris_mcs[:, reg].mean(), color='g')
-    axes[1].axvline(paris_uws[:, reg].mean(), color='y')
-    axes[0].set_xlim(0, 10)
-    axes[1].set_xlim(0, 10)
-    plt.xlabel('mean metabolic activity of ' + selected_regions.iloc[reg]['roi_name'])
-    plt.show()
-
 
 for reg in range(10):
     region = 'reg_' + str(reg)
@@ -118,3 +97,35 @@ for reg in range(10):
     plt.title('mean metabolic activity of ' + selected_regions.iloc[reg]['roi_name'])
     plt.tight_layout()
     plt.show()
+
+plt.figure()
+gs = sns.swarmplot(x="site", y=df['extracr'],
+              data=df, dodge=True)
+
+gs.axhline(y = df[df['site']=='Paris']['extracr'].mean(), xmin=0.02, xmax=0.4, color='r')
+gs.axhline(y = df[df['site']=='Paris']['extracr'].mean(), xmin=.7, xmax=.9, color='r')
+plt.show()
+
+# for reg in range(10):
+#     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
+#     liege_mcs = selected_liege_feat[numpy.where(y_train == 1)[0]]
+#     liege_uws = selected_liege_feat[numpy.where(y_train == 0)[0]]
+#     paris_mcs = selected_paris_feat[numpy.where(y_test == 1)[0]]
+#     paris_uws = selected_paris_feat[numpy.where(y_test == 0)[0]]
+#     sns.distplot(bins=100, a=liege_mcs[:, reg], ax=axes[0], label='Liege MCS',
+#                  rug=True, hist=False, color = 'b')
+#     sns.distplot(bins=100, a=liege_uws[:, reg], ax=axes[0], label='Liege UWS',
+#                  rug=True, hist=False, color = 'r')
+#     axes[0].axvline(liege_mcs[:, reg].mean(), color='b')
+#     axes[0].axvline(liege_uws[:, reg].mean(), color='r')
+#
+#     sns.distplot(bins=100, a=paris_mcs[:, reg], ax=axes[1], label='Paris MCS',
+#                  rug=True, hist=False, color = 'g')
+#     sns.distplot(bins=100, a=paris_uws[:, reg], ax=axes[1], label='Paris UWS',
+#                  rug=True, hist=False, color = 'y')
+#     axes[1].axvline(paris_mcs[:, reg].mean(), color='g')
+#     axes[1].axvline(paris_uws[:, reg].mean(), color='y')
+#     axes[0].set_xlim(0, 10)
+#     axes[1].set_xlim(0, 10)
+#     plt.xlabel('mean metabolic activity of ' + selected_regions.iloc[reg]['roi_name'])
+#     plt.show()
