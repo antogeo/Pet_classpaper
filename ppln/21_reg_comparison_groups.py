@@ -108,12 +108,12 @@ for reg in range(10):
     paris_mcs = selected_paris_feat[numpy.where(y_test == 1)[0]]
     paris_uws = selected_paris_feat[numpy.where(y_test == 0)[0]]
     plt.figure()
-    gs = sns.swarmplot(x="site", y=region, hue="label",
+    gs = sns.swarmplot(x="label", y=region, hue="site",
                   data=df, dodge=True)
-    gs.axhline(liege_mcs[:, reg].mean(), color='b')
-    gs.axhline(liege_uws[:, reg].mean(), color='r')
-    gs.axhline(paris_mcs[:, reg].mean(), color='g')
-    gs.axhline(paris_uws[:, reg].mean(), color='y')
+    gs.axhline(y = liege_mcs[:, reg].mean(), xmin=0.08, xmax=0.22, color='r')
+    gs.axhline(y = paris_mcs[:, reg].mean(), xmin=.28, xmax=.42, color='r')
+    gs.axhline(y = liege_uws[:, reg].mean(), xmin=.58, xmax=.72, color='r')
+    gs.axhline(y = paris_uws[:, reg].mean(), xmin=.78, xmax=.92, color='r')
     gs.set_ylim(0, 10)
     plt.title('mean metabolic activity of ' + selected_regions.iloc[reg]['roi_name'])
     plt.tight_layout()
