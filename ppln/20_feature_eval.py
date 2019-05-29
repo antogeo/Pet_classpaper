@@ -34,16 +34,16 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 group = 'Liege'
 
 df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                 group + '_db_GM_AAL_nocereb.csv'))
+                 group + '_db_GM_AAL.csv'))
 df_train = df.query('QC_PASS == True and ML_VALIDATION == False')
 
 classifiers = OrderedDict()
 
 classifiers['SVC'] = Pipeline([
         ('scaler', RobustScaler()),
-        ('select', SelectKBest(f_classif, 94)),
+        ('select', SelectKBest(f_classif, 10)),
         ('clf', SVC(kernel="linear", C=1, probability=True,
-                    class_weight={0: 1, 1: 1}))
+                    class_weight={0: 1, 1: 2.4}))
     ])
 classifiers['RF'] = Pipeline([
     ('scaler', RobustScaler()),
@@ -68,11 +68,13 @@ y_train = 1 - (df_train[
 
 roi_names = pd.read_csv(op.join(db_path, group, 'extra',
                         'aal_rois.csv'))
+
 classifiers['SVC'].fit(X_train, y_train)
-classifiers['SVC'].named_steps['select'].get_support(indices=True)
 classifiers['RF'].fit(X_train, y_train)
 classifiers['XRF'].fit(X_train, y_train)
 
+
+roi_names['roi_name'][0:95].values[classifiers['SVC'].named_steps['select'].get_support()]
 
 results = dict()
 results['rois'] = roi_names['roi_name'][0:95].values
@@ -93,17 +95,32 @@ axes = sns.factorplot(x='rois', y='importances', hue='classifiers',
 
 axes.set_xticklabels(results['rois'], rotation=90)
 
+roi_names['roi_name'][0:95]
+
+
+# FOR SVM
+svm_reg_name = roi_names['roi_name'][0:95].values[selector.get_support()]
+svm_reg_values = selector.pvalues_[selector.get_support()]
+plt.figure()
+plt.ylim(0, 1.05)
+plt.bar(roi_names['roi_name'][0:95].values, minmax_scale(-np.log10(
+    selector.pvalues_), feature_range=(0, 1)), 0.35, label='10 best rois')
+plt.xticks(rotation='vertical')
+
+
 atlas_nii = nib.load(op.join(db_path, group, 'extra',
                      'AAL_noCereb.nii'))
 vol = atlas_nii.get_data()
-
+new_vol = np.zeros_like(vol)
 for val in np.unique(vol):
     print(int(val.round()))
-    print(results['importances'][int(val.round())])
-    vol[vol == val] = results['importances'][int(val.round())]
+    print(results['RFimportances'][int(val.round())])
+    if classifiers['SVC'].named_steps['select'].get_support()[
+        int(val.round())]==True:
+        new_vol[vol == val] = results['fscore'][int(val.round())]
 
 new_header = atlas_nii.header.copy()
-new_image = nib.Nifti1Image(vol, atlas_nii.affine, header=new_header)
+new_image = nib.Nifti1Image(new_vol, atlas_nii.affine, header=new_header)
 new_image.to_filename(op.join(
-    db_path, group, 'group_results_SUV', 'feat_importance.nii'))
+    db_path, group, 'group_results_SUV', 'f_scores.nii'))
 plotting.plot_anat(new_image, title='test')

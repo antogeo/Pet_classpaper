@@ -38,9 +38,18 @@ sns.lineplot(
     x="Weight Val", y="AUC", hue="Classifier", data=df, ax=axes[2])
 for i in axes:
     i.set_xlabel('MCS/UWS (Weights Ratio)')
-    i.set_xlim(0, 10)
-    i.xaxis.set_major_locator(ticker.MultipleLocator(.2))
-    # i.legend(('SVC', 'Random Forest', 'Dummy'), title="Classifier")
-
+    i.set_xlim(0.1, 10)
+    i.set_ylim(0.4, 1.05)
+    i.xaxis.set_major_locator(ticker.MultipleLocator(.4))
+    i.set_xscale('log')
+    i.set_xticks([0.1, line2, 1, line1, 10])
+    i.tick_params(axis='x', direction='out', length=3, width=1, grid_color='r',
+                  labelrotation=90, grid_alpha=0.5)
+    # i.xticks(x, labels, rotation='vertical')
+    # i.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter('%.1f'))
+    i.xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+    i.legend(('SVM', 'Random Forest', 'Dummy'), title="Classifier",
+        bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+    i.axvline(1, linestyle='dashed', color='red')
 # plt.savefig('./group_results_SUV/weights_nAAL_compar_box.pdf')
 plt.show()
