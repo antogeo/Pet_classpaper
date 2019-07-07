@@ -13,7 +13,7 @@ from sklearn.feature_selection import f_classif, SelectKBest
 import seaborn as sns
 import matplotlib.pyplot as plt
 if os.uname()[1] == 'antogeo-XPS':
-    db_path = '/home/antogeo/data/PET/pet_suv_db/'
+    db_path = '/home/antogeo/dox/pet_suv_db/'
 elif os.uname()[1] == 'comameth':
     db_path = '/home/coma_meth/dox/pet_suv_db/'
 elif os.uname()[1] in ['mia.local', 'mia']:
@@ -22,7 +22,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 logging.basicConfig(level='INFO')
 
 meta_fname = pd.read_csv(op.join(db_path, 'Liege', 'group_results_SUV',
-                         'Liege' + '_db_GM_AAL_nocereb.csv'))
+                         'Liege' + '_db_GM_AAL.csv'))
 #  df = compute_regional_features(db_path, meta_fname)
 
 df = meta_fname.query('QC_PASS == True and ML_VALIDATION == False')
@@ -72,11 +72,15 @@ results_df = pd.DataFrame(results)
 
 fig, axes = plt.subplots(3, 1, figsize=(12, 6))
 sns.lineplot(x="feat_num", y='AUC',
-             data=results_df, color='red', ax=axes[0])
+             data=results_df, color='blue', ax=axes[0])
 sns.lineplot(x="feat_num", y='Precision',
-             data=results_df, color='red', ax=axes[1])
+             data=results_df, color='blue', ax=axes[1])
 sns.lineplot(x="feat_num", y='Recall',
-             data=results_df, color='red',  ax=axes[2])
+             data=results_df, color='blue',  ax=axes[2])
+for i in axes:
+    i.set_xlim(0, 95)
+    i.set_ylim(0.61, .9)
+    i.axvline(10, color='red', linestyle='--')
 
 
 results_df.to_csv(op.join(db_path, 'Liege', 'group_results_SUV',
