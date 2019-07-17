@@ -7,7 +7,8 @@ from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
-from sklearn.metrics import (roc_auc_score, precision_score, recall_score)
+from sklearn.metrics import (roc_auc_score, precision_score, recall_score,
+                             f1_score)
 from sklearn.feature_selection import f_classif, SelectKBest
 
 import seaborn as sns
@@ -36,6 +37,7 @@ results['feat_num'] = []
 results['AUC'] = []
 results['Precision'] = []
 results['Recall'] = []
+results['f1'] = []
 for feat_num in range(1, X.shape[1]):
     print(feat_num)
     sss = StratifiedShuffleSplit(
@@ -58,29 +60,35 @@ for feat_num in range(1, X.shape[1]):
         auc_score = roc_auc_score(y_test, y_pred_proba)
         prec_score = precision_score(y_test, y_pred_class)
         rec_score = recall_score(y_test, y_pred_class)
+        f_score = f1_score(y_test, y_pred_class)
 
         results['Iteration'].append(t_iter)
         results['feat_num'].append(feat_num)
         results['AUC'].append(auc_score)
         results['Precision'].append(prec_score)
         results['Recall'].append(rec_score)
-
+        results['f1'].append(f_score)
 results_df = pd.DataFrame(results)
 
 # metrics = ['AUC', 'Precision', 'Recall']
 # colors = ['red', 'green', 'blue']
 
-fig, axes = plt.subplots(3, 1, figsize=(12, 6))
+fig, axes = plt.subplots(4, 1, figsize=(12, 6))
 sns.lineplot(x="feat_num", y='AUC',
              data=results_df, color='blue', ax=axes[0])
 sns.lineplot(x="feat_num", y='Precision',
              data=results_df, color='blue', ax=axes[1])
 sns.lineplot(x="feat_num", y='Recall',
              data=results_df, color='blue',  ax=axes[2])
-for i in axes:
+sns.lineplot(x="feat_num", y='f1',
+             data=results_df, color='blue',  ax=axes[3])
+
+max_val = [10, 10, 46, 10]
+
+for j, i in enumerate(axes):
     i.set_xlim(0, 95)
     i.set_ylim(0.61, .9)
-    i.axvline(10, color='red', linestyle='--')
+    i.axvline(max_val[j], color='red', linestyle='--')
 
 
 results_df.to_csv(op.join(db_path, 'Liege', 'group_results_SUV',

@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import os.path as op
 from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
 from sklearn.feature_selection import f_classif, SelectKBest
@@ -38,9 +38,9 @@ classifiers['SVC_prec'] = Pipeline([
         ('clf', SVC(kernel="linear", C=1,  probability=True,
                     class_weight={0: 1, 1: .55}))
     ])
-classifiers['RF'] = Pipeline([
+classifiers['XRF'] = Pipeline([
     ('scaler', RobustScaler()),
-    ('clf', RandomForestClassifier(
+    ('clf', ExtraTreesClassifier(
         max_depth=5, n_estimators=2000, max_features='auto',
         class_weight={0: 1, 1: 1}))
 ])
@@ -79,4 +79,4 @@ df_res = pd.DataFrame(results)
 df = df_res.pivot(columns='Classifier', index='Subject')
 df['Label'] = results['Label'][0:53]
 df.to_csv(op.join(db_path, group, 'group_results_SUV',
-                  group + 'validation_set_10best_results_ctrlout.csv'))
+                  group + 'validation_set_10best_results_ctrloutXRF.csv'))

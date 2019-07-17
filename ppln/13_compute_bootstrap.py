@@ -6,7 +6,7 @@ from sklearn.utils import resample
 from sklearn.metrics import roc_auc_score, precision_score, recall_score
 from sklearn.svm import SVC
 from sklearn.dummy import DummyClassifier
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
 from sklearn.feature_selection import f_classif, SelectPercentile
@@ -41,9 +41,9 @@ classifiers['SVC_prec'] = Pipeline([
         ('clf', SVC(kernel="linear", C=1,  probability=True,
                     class_weight={0: 1, 1: .6}))
     ])
-classifiers['RF'] = Pipeline([
+classifiers['XRF'] = Pipeline([
     ('scaler', RobustScaler()),
-    ('clf', RandomForestClassifier(
+    ('clf', ExtraTreesClassifier(
         max_depth=5, n_estimators=2000, max_features='auto',
         class_weight={0: 1, 1: 1}))
 ])
@@ -109,5 +109,5 @@ for clf_name, clf in classifiers.items():
 df_res = pd.DataFrame(results)
 # df_feat.to_csv('./group_results_SUV/feat_rank.csv')
 df_res.to_csv(op.join(db_path, group, 'group_results_SUV',
-              'perf_estim_1000iter_f10_AAL90_ctrlout.csv'))
+              'perf_estim_1000iter_f10_28_4_AAL90_Xrf5.csv'))
 # df_feats.to_csv('./group_results_SUV/selected_features.csv')

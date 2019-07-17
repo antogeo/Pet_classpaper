@@ -17,7 +17,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 group = 'Liege'
 
 df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                 'perf_estim_1000iter_f10_AAL90.csv'),
+                 'perf_estim_1000iter_f10_AAL90_Xrf.csv'),
                  index_col=['Iteration', 'Classifier'])[
                     ['AUC', 'Precision', 'Recall']]
 

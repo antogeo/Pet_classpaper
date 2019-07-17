@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import os.path as op
 from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
+from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
 from sklearn.feature_selection import f_classif, SelectKBest
@@ -45,12 +45,6 @@ classifiers['SVC'] = Pipeline([
         ('clf', SVC(kernel="linear", C=1, probability=True,
                     class_weight={0: 1, 1: 2.4}))
     ])
-classifiers['RF'] = Pipeline([
-    ('scaler', RobustScaler()),
-    ('clf', RandomForestClassifier(
-        max_depth=5, n_estimators=2000, max_features='auto',
-        class_weight={0: 1, 1: 1}))
-])
 classifiers['XRF'] = Pipeline([
     ('scaler', RobustScaler()),
     ('clf', ExtraTreesClassifier(
@@ -74,14 +68,13 @@ classifiers['RF'].fit(X_train, y_train)
 classifiers['XRF'].fit(X_train, y_train)
 
 
-roi_names['roi_name'][0:95].values[classifiers['SVC'].named_steps['select'].get_support()]
+roi_names['roi_name'][0:95].values[classifiers['SVC'].named_steps[
+    'select'].get_support()]
 
 results = dict()
 results['rois'] = roi_names['roi_name'][0:95].values
 results['fscore'] = minmax_scale(-np.log10(
     classifiers['SVC'].named_steps['select'].pvalues_),  feature_range=(0, 1))
-results['RFimportances'] = minmax_scale(classifiers[
-    'RF'].named_steps['clf'].feature_importances_,  feature_range=(0, 1))
 results['XRFimportances'] = minmax_scale(classifiers[
     'XRF'].named_steps['clf'].feature_importances_,  feature_range=(0, 1))
 
@@ -114,13 +107,15 @@ vol = atlas_nii.get_data()
 new_vol = np.zeros_like(vol)
 for val in np.unique(vol):
     print(int(val.round()))
-    print(results['RFimportances'][int(val.round())])
-    if classifiers['SVC'].named_steps['select'].get_support()[
-        int(val.round())]==True:
-        new_vol[vol == val] = results['fscore'][int(val.round())]
+    print(results['XRFimportances'][int(val.round())])
+    # if classifiers['SVC'].named_steps['select'].get_support()[
+    #         int(val.round())] is True:
+    #     new_vol[vol == val] = results['fscore'][int(val.round())]
+    # else:
+    new_vol[vol == val] = results['XRFimportances'][int(val.round())]
 
 new_header = atlas_nii.header.copy()
 new_image = nib.Nifti1Image(new_vol, atlas_nii.affine, header=new_header)
 new_image.to_filename(op.join(
-    db_path, group, 'group_results_SUV', 'f_scores.nii'))
+    db_path, group, 'group_results_SUV', 'xrt_scores.nii'))
 plotting.plot_anat(new_image, title='test')

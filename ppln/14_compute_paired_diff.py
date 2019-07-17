@@ -1,9 +1,11 @@
 # plot scores
 import pandas as pd
 import numpy as np
+import os
+import os.path as op
 
 if os.uname()[1] == 'antogeo-XPS':
-    db_path = '/home/antogeo/data/PET/pet_suv_db/'
+    db_path = '/home/antogeo/dox/pet_suv_db/'
 elif os.uname()[1] == 'comameth':
     db_path = '/home/coma_meth/dox/pet_suv_db/'
 elif os.uname()[1] in ['mia.local', 'mia']:
@@ -12,7 +14,7 @@ elif os.uname()[1] in ['mia.local', 'mia']:
 group = 'Liege'
 
 df = pd.read_csv(op.join(db_path, group, 'group_results_SUV',
-                'perf_estim_1000iter_f10_AAL90_ctrlout.csv'),
+                 'perf_estim_1000iter_f10_28_4_AAL90_Xrf5.csv'),
                  index_col=['Iteration', 'Classifier'])[
                     ['AUC', 'Precision', 'Recall']]
 
@@ -34,7 +36,7 @@ all_diffs = pd.concat(diffs)
 
 
 all_diffs.to_csv(op.join(db_path, group, 'group_results_SUV',
-                 'Clfs_contrast_f10_AAL90_ctrlout.csv'))
+                 'Clfs_contrast_f10__28_4_AAL90_Xrf5.csv'))
 
 
 def _compute_p_vals(df, column, ci=.95):
