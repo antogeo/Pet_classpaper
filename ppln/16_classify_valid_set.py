@@ -36,7 +36,7 @@ classifiers['SVC_prec'] = Pipeline([
         ('scaler', RobustScaler()),
         ('select', SelectKBest(f_classif, 10)),
         ('clf', SVC(kernel="linear", C=1,  probability=True,
-                    class_weight={0: 1, 1: .55}))
+                    class_weight={0: 1, 1: .6}))
     ])
 classifiers['XRF'] = Pipeline([
     ('scaler', RobustScaler()),
@@ -79,4 +79,4 @@ df_res = pd.DataFrame(results)
 df = df_res.pivot(columns='Classifier', index='Subject')
 df['Label'] = results['Label'][0:53]
 df.to_csv(op.join(db_path, group, 'group_results_SUV',
-                  group + 'validation_set_10best_results_ctrloutXRF.csv'))
+                  group + 'validation_set_10best_results_XRF.csv'))
