@@ -40,6 +40,8 @@ results['Recall'] = []
 results['f1'] = []
 for feat_num in range(1, X.shape[1]):
     print(feat_num)
+    # sss = RepeatedKFold(
+    #     n_splits=5, n_repeats=50, random_state=feat_num)
     sss = StratifiedShuffleSplit(
         n_splits=100, test_size=0.3, random_state=feat_num)
     for t_iter, (train, test) in enumerate(sss.split(X, y)):
@@ -89,7 +91,7 @@ for j, i in enumerate(axes):
     i.set_xlim(0, 95)
     i.set_ylim(0.61, .9)
     i.axvline(max_val[j], color='red', linestyle='--')
-
+plt.show()
 
 results_df.to_csv(op.join(db_path, 'Liege', 'group_results_SUV',
-                          'Liege' + 'feature_eval_nocereb.csv'))
+                          'Liege' + 'feature_eval_nocereb_kfold.csv'))

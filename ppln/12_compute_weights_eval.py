@@ -5,7 +5,7 @@
     import seaborn as sns
     import matplotlib.pyplot as plt
     from collections import OrderedDict
-    from sklearn.model_selection import StratifiedShuffleSplit
+    from sklearn.model_selection import RepeatedKFold
     from sklearn.svm import SVC
     from sklearn.ensemble import ExtraTreesClassifier
     from sklearn.dummy import DummyClassifier
@@ -45,8 +45,7 @@
     results['Precision'] = []
     results['Recall'] = []
 
-    sss = StratifiedShuffleSplit(
-        n_splits=50, test_size=0.3, random_state=42)
+    sss = RepeatedKFold(n_splits=5, n_repeats=50, random_state=42)
 
     for t_iter, (train, test) in enumerate(sss.split(X, y)):
         for val in weight_val:
