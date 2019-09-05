@@ -3,9 +3,23 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
+from matplotlib.ticker import FormatStrFormatter
+import os
+import os.path as op
 
-df = pd.read_csv('./group_results_SUV/weights_eval_AAL_nocereb.csv')
-df = df[df['Classifier']!='SVC_fs20']
+if os.uname()[1] == 'antogeo-XPS':
+    db_path = '/home/antogeo/dox/pet_suv_db/'
+elif os.uname()[1] == 'comameth':
+    db_path = '/home/coma_meth/dox/pet_suv_db/'
+elif os.uname()[1] in ['mia.local', 'mia']:
+    db_path = '/Users/fraimondo/data/pet_suv_db/'
+
+group = 'Liege'
+
+df = pd.read_csv(op.join(db_path, group,
+                 'group_results_SUV', 'weights_eval_AAL_XRF_kfold.csv'))
+df = df[df['Classifier'] != 'SVC_fs20']
+df = df[df['Classifier'] != 'XRF']
 res = dict()
 res['weights'] = []
 res['mean rec'] = []
@@ -22,6 +36,8 @@ line1 = results.loc[np.abs(results['mean rec'] - .95).idxmin(), 'weights']
 line2 = results.loc[np.abs(results['mean pre'] - .9).idxmin(), 'weights']
 
 fig, axes = plt.subplots(3, 1, figsize=(12, 6))
+sns.set(font_scale=1.02)
+
 
 sns.lineplot(
     x="Weight Val", y="Recall", hue="Classifier", data=df, ax=axes[0])
@@ -48,8 +64,8 @@ for i in axes:
     # i.xticks(x, labels, rotation='vertical')
     # i.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter('%.1f'))
     i.xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-    i.legend(('SVM', 'Random Forest', 'Dummy'), title="Classifier",
-        bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+    i.legend(('SVM', 'Dummy'), title="Classifier",
+             bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
     i.axvline(1, linestyle='dashed', color='red')
 # plt.savefig('./group_results_SUV/weights_nAAL_compar_box.pdf')
 plt.show()

@@ -89,9 +89,9 @@ max_val = [10, 10, 46, 10]
 
 for j, i in enumerate(axes):
     i.set_xlim(0, 95)
-    i.set_ylim(0.61, .9)
+    i.set_ylim(0.3, .9)
     i.axvline(max_val[j], color='red', linestyle='--')
 plt.show()
 
 results_df.to_csv(op.join(db_path, 'Liege', 'group_results_SUV',
-                          'Liege' + 'feature_eval_nocereb_kfold.csv'))
+                          'Liege' + 'feature_eval_nocereb.csv'))

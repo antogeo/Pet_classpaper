@@ -106,4 +106,5 @@
     # ax.tick_params(axis='x', direction='out', length=3, width=1, grid_color='r',
     #                labelrotation=90, grid_alpha=0.5)
 
-    df.to_csv('./group_results_SUV/weights_eval_AAL_XRF.csv')
+    df.to_csv(op.join(db_path, group, 'group_results_SUV',
+                      'weights_eval_AAL_XRF_kfold.csv'))
