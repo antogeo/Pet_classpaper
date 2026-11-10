@@ -8,8 +8,7 @@ elif os.uname()[1] == 'comameth':
     db_path = '/home/coma_meth/Documents/PET/pet_suv_db/Paris/subjects'
 elif os.uname()[1] in ['mia.local', 'mia']:
     db_path = '/Users/fraimondo/data/pet_suv_db/'
-converter = Dcm2nii()
-
+# converter = Dcm2nii()
 
 for subject in os.listdir(db_path):
-    pre.create_suv(os.join(db_path, subject))
+    pre.create_suv(os.path.join(db_path, subject))
